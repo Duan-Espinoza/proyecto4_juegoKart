@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MenuPrincipal from './components/MenuPrincipal';
+import Autenticacion from './components/Autenticacion';
 import CrearPartida from './components/CrearPartida';
 import UnirsePartida from './components/UnirsePartida';
 import Ranking from './components/Ranking';
@@ -17,6 +18,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MenuPrincipal />} />
+        <Route path="/auth" element={<Autenticacion />} />
         <Route path="/crear" element={<CrearPartida />} />
         <Route path="/unirse" element={<UnirsePartida />} />
         <Route path="/ranking" element={<Ranking />} />
