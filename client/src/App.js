@@ -1,12 +1,8 @@
-import './App.css';
-
+import React from "react";
+import GameConfig from "./components/GameConfig";
 
 function App() {
-  return (
-    <div className="App">
-      <GameConfig />
-    </div>
-  );
+  return <GameConfig />;
 }
 
 export default App;
