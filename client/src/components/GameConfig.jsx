@@ -19,77 +19,82 @@ export default function GameConfig() {
     setShowTrackModal(false);
   };
 
+  const handleStartGame = () => {
+    if (!gameType || !track || !laps || !players) {
+      alert("Por favor, completa todos los campos antes de iniciar la partida");
+    } else {
+      alert("¡Partida iniciada con éxito!");
+    }
+  };
+
   return (
-    <div className="menu-bg">
-      <div className="menu-panel">
-        <h1 className="menu-title">Configuración de partida</h1>
+    <div className="config-bg">
+      <div className="config-panel">
+        <h1 className="config-title">Configuración de partida</h1>
 
-        <ComboBox value={gameType} onChange={setGameType} />
+        <div className="config-field">
+          <ComboBox value={gameType} onChange={setGameType} />
+        </div>
 
-        <button className="menu-btn" onClick={() => setShowTrackModal(true)}>
+        <button className="config-btn" onClick={() => setShowTrackModal(true)}>
           Seleccionar pista
         </button>
 
         {track && (
-          <div style={{ marginTop: 15, textAlign: "left" }}>
+          <div className="track-summary">
             <p><strong>Pista:</strong> {track}</p>
             <p><strong>Vueltas:</strong> {laps}</p>
             <p><strong>Jugadores:</strong> {players}</p>
           </div>
         )}
 
-        <button
-          className="menu-btn"
-          onClick={() => {
-            if (!gameType || !track || !laps || !players) {
-              alert("Por favor, completa todos los campos antes de iniciar la partida");
-            } else {
-              alert("¡Partida iniciada con éxito!");
-            }
-          }}
-        >
+        <button className="config-btn" onClick={handleStartGame}>
           Iniciar partida
         </button>
       </div>
 
       {showTrackModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <h2 style={{ marginBottom: 10 }}>Detalles de pista</h2>
+        <div className="config-modal-overlay" onClick={closeModal}>
+          <div className="config-modal" onClick={e => e.stopPropagation()}>
+            <h2 className="config-title">Detalles de pista</h2>
 
-            <label>Pista:</label>
-            <select value={track} onChange={e => setTrack(e.target.value)} style={{ width: "100%", marginBottom: 10 }}>
-              <option value="">--Selecciona--</option>
-              <option value="Pista 1">Pista 1</option>
-              <option value="Pista 2">Pista 2</option>
-              <option value="Pista 3">Pista 3</option>
-            </select>
+            <div className="config-field">
+              <label>Pista:</label>
+              <select value={track} onChange={e => setTrack(e.target.value)}>
+                <option value="">--Selecciona--</option>
+                <option value="Pista 1">Pista 1</option>
+                <option value="Pista 2">Pista 2</option>
+                <option value="Pista 3">Pista 3</option>
+              </select>
+            </div>
 
-            <label>Vueltas:</label>
-            <input
-              type="number"
-              min="1"
-              value={laps}
-              onChange={e => setLaps(e.target.value)}
-              placeholder="Ej: 3"
-              style={{ width: "100%", marginBottom: 10 }}
-            />
+            <div className="config-field">
+              <label>Vueltas:</label>
+              <input
+                type="number"
+                min="1"
+                value={laps}
+                onChange={e => setLaps(e.target.value)}
+                placeholder="Ej: 3"
+              />
+            </div>
 
-            <label>Jugadores:</label>
-            <input
-              type="number"
-              min="1"
-              value={players}
-              onChange={e => setPlayers(e.target.value)}
-              placeholder="Ej: 2"
-              style={{ width: "100%", marginBottom: 20 }}
-            />
+            <div className="config-field">
+              <label>Jugadores:</label>
+              <input
+                type="number"
+                min="1"
+                value={players}
+                onChange={e => setPlayers(e.target.value)}
+                placeholder="Ej: 2"
+              />
+            </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <button className="menu-btn purple" onClick={closeModal} style={{ flex: 1, marginRight: 10 }}>
+            <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+              <button className="config-btn" onClick={closeModal}>
                 Cancelar
               </button>
-              <button className="menu-btn yellow" onClick={saveTrackDetails} style={{ flex: 1 }}>
+              <button className="config-btn" onClick={saveTrackDetails}>
                 Guardar
               </button>
             </div>

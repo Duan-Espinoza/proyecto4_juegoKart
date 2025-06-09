@@ -1,4 +1,4 @@
-.menu-bg {
+.config-bg {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -8,29 +8,53 @@
   overflow: hidden;
 }
 
-.menu-panel {
+.config-panel {
   background: rgba(255, 255, 255, 0.92);
   border-radius: 2rem;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
   padding: 2rem;
-  max-width: 350px;
+  max-width: 360px;
   width: 100%;
   text-align: center;
-  border: 3px solid #a78bfa;
+  border: 3px solid #4000ff;
   position: relative;
   z-index: 1;
 }
 
-.menu-title {
+.config-title {
   font-size: 2rem;
   font-weight: 900;
   background: linear-gradient(90deg, #ef4444, #2563eb, #22c55e, #fde047);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 1rem;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1.5rem;
 }
 
-.menu-btn {
+.config-field {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.config-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #2563eb;
+}
+
+.config-field select,
+.config-field input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+}
+
+.config-btn {
   font-size: 1rem;
   font-weight: bold;
   padding: 0.75rem 0;
@@ -42,33 +66,41 @@
   transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
   outline: none;
   width: 100%;
+  background: linear-gradient(135deg, #4000ff, #029a28, #008a8f);
   margin-top: 1rem;
 }
 
-.menu-btn{
-  background: linear-gradient(135deg, #4000ff, #029a28, #008a8f);
-}
-
-.menu-btn:hover {
+.config-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 16px 0 rgba(123, 34, 255, 0.18);
   filter: brightness(1.08);
 }
 
-.modal-overlay {
+.track-summary {
+  text-align: left;
+  margin-top: 1rem;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 1rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.config-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.modal-box {
+.config-modal {
   background: white;
-  padding: 20px;
-  border-radius: 1rem;
-  min-width: 300px;
-  position: relative;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
