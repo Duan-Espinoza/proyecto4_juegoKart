@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "./ui/Button";
+import "../styles/GameConfig.css"; 
 import ComboBox from "./ui/Combobox";
 
 export default function GameConfig() {
@@ -9,10 +9,8 @@ export default function GameConfig() {
   const [laps, setLaps] = useState("");
   const [players, setPlayers] = useState("");
 
-  // Para cerrar la modal
   const closeModal = () => setShowTrackModal(false);
 
-  // Para guardar datos y cerrar modal (podrías ampliar aquí la lógica)
   const saveTrackDetails = () => {
     if (!track || !laps || !players) {
       alert("Por favor, completa todos los campos");
@@ -22,107 +20,82 @@ export default function GameConfig() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "2rem" }}>
-      <h1 className="text-2xl font-bold mb-4">Configuración de partida</h1>
+    <div className="menu-bg">
+      <div className="menu-panel">
+        <h1 className="menu-title">Configuración de partida</h1>
 
-      <div style={{ maxWidth: "400px", width: "100%", padding: "1rem", border: "1px solid #ccc", borderRadius: 8 }}>
         <ComboBox value={gameType} onChange={setGameType} />
 
-        <Button style={{ marginTop: 20 }} onClick={() => setShowTrackModal(true)}>
+        <button className="menu-btn purple" onClick={() => setShowTrackModal(true)}>
           Seleccionar pista
-        </Button>
+        </button>
 
         {track && (
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 15, textAlign: "left" }}>
             <p><strong>Pista:</strong> {track}</p>
             <p><strong>Vueltas:</strong> {laps}</p>
             <p><strong>Jugadores:</strong> {players}</p>
           </div>
         )}
+
+        <button
+          className="menu-btn yellow"
+          onClick={() => {
+            if (!gameType || !track || !laps || !players) {
+              alert("Por favor, completa todos los campos antes de iniciar la partida");
+            } else {
+              alert("¡Partida iniciada con éxito!");
+            }
+          }}
+        >
+          Iniciar partida
+        </button>
       </div>
 
       {showTrackModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000
-          }}
-          onClick={closeModal} // cerrar si clicas fuera del modal
-        >
-          <div
-            style={{
-              background: "white",
-              padding: 20,
-              borderRadius: 8,
-              minWidth: 300,
-              position: "relative"
-            }}
-            onClick={e => e.stopPropagation()} 
-          >
-            <h2>Selecciona detalles de la pista</h2>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <h2 style={{ marginBottom: 10 }}>Detalles de pista</h2>
 
-            <div style={{ marginBottom: 10 }}>
-              <label>Pista:</label>
-              <select value={track} onChange={e => setTrack(e.target.value)} style={{ width: "100%", padding: 6 }}>
-                <option value="">--Selecciona--</option>
-                <option value="Pista 1">Pista 1</option>
-                <option value="Pista 2">Pista 2</option>
-                <option value="Pista 3">Pista 3</option>
-              </select>
-            </div>
+            <label>Pista:</label>
+            <select value={track} onChange={e => setTrack(e.target.value)} style={{ width: "100%", marginBottom: 10 }}>
+              <option value="">--Selecciona--</option>
+              <option value="Pista 1">Pista 1</option>
+              <option value="Pista 2">Pista 2</option>
+              <option value="Pista 3">Pista 3</option>
+            </select>
 
-            <div style={{ marginBottom: 10 }}>
-              <label>Número de vueltas:</label>
-              <input
-                type="number"
-                min="1"
-                value={laps}
-                onChange={e => setLaps(e.target.value)}
-                style={{ width: "100%", padding: 6 }}
-                placeholder="Ej: 3"
-              />
-            </div>
+            <label>Vueltas:</label>
+            <input
+              type="number"
+              min="1"
+              value={laps}
+              onChange={e => setLaps(e.target.value)}
+              placeholder="Ej: 3"
+              style={{ width: "100%", marginBottom: 10 }}
+            />
 
-            <div style={{ marginBottom: 20 }}>
-              <label>Cantidad de jugadores:</label>
-              <input
-                type="number"
-                min="1"
-                value={players}
-                onChange={e => setPlayers(e.target.value)}
-                style={{ width: "100%", padding: 6 }}
-                placeholder="Ej: 2"
-              />
-            </div>
+            <label>Jugadores:</label>
+            <input
+              type="number"
+              min="1"
+              value={players}
+              onChange={e => setPlayers(e.target.value)}
+              placeholder="Ej: 2"
+              style={{ width: "100%", marginBottom: 20 }}
+            />
 
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button onClick={closeModal} style={{ marginRight: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button className="menu-btn purple" onClick={closeModal} style={{ flex: 1, marginRight: 10 }}>
                 Cancelar
-              </Button>
-              <Button onClick={saveTrackDetails}>Guardar</Button>
+              </button>
+              <button className="menu-btn yellow" onClick={saveTrackDetails} style={{ flex: 1 }}>
+                Guardar
+              </button>
             </div>
           </div>
         </div>
       )}
-      
-      <Button
-        onClick={() => {
-          if (!gameType || !track || !laps || !players) {
-            alert("Por favor, completa todos los campos antes de iniciar la partida");
-          } else {
-            // Aquí podrías iniciar la partida
-            alert("Partida iniciada con éxito!");
-          }
-        }}
-        style={{ marginTop: 20 }}
-      >
-        Iniciar partida
-      </Button>
     </div>
   );
 }
