@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #3b0764 0%, #db2777 60%, #fde047 100%);
+  background: linear-gradient(90deg, #ff0000, #0044d5, #0cc851, #e5ff00);
   position: relative;
   overflow: hidden;
 }
@@ -11,7 +11,7 @@
 .menu-panel {
   background: rgba(255, 255, 255, 0.92);
   border-radius: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
   padding: 2rem;
   max-width: 350px;
   width: 100%;
@@ -24,7 +24,7 @@
 .menu-title {
   font-size: 2rem;
   font-weight: 900;
-  background: linear-gradient(90deg, #7c3aed, #db2777, #fde047);
+  background: linear-gradient(90deg, #ef4444, #2563eb, #22c55e, #fde047);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1rem;
@@ -45,12 +45,8 @@
   margin-top: 1rem;
 }
 
-.menu-btn.purple {
-  background: linear-gradient(90deg, #7c3aed, #db2777);
-}
-
-.menu-btn.yellow {
-  background: linear-gradient(90deg, #fde047, #ef4444);
+.menu-btn{
+  background: linear-gradient(135deg, #4000ff, #029a28, #008a8f);
 }
 
 .menu-btn:hover {

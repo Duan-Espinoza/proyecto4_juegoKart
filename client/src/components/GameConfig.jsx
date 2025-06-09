@@ -26,7 +26,7 @@ export default function GameConfig() {
 
         <ComboBox value={gameType} onChange={setGameType} />
 
-        <button className="menu-btn purple" onClick={() => setShowTrackModal(true)}>
+        <button className="menu-btn" onClick={() => setShowTrackModal(true)}>
           Seleccionar pista
         </button>
 
@@ -39,7 +39,7 @@ export default function GameConfig() {
         )}
 
         <button
-          className="menu-btn yellow"
+          className="menu-btn"
           onClick={() => {
             if (!gameType || !track || !laps || !players) {
               alert("Por favor, completa todos los campos antes de iniciar la partida");
