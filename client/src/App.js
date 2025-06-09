@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MenuPrincipal from './components/MenuPrincipal';
 import CrearPartida from './components/CrearPartida';
 import UnirsePartida from './components/UnirsePartida';
+import Ranking from './components/Ranking';
 import './App.css';
 import axios from 'axios';
 

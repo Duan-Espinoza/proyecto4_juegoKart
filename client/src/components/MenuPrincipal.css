@@ -1,0 +1,108 @@
+.menu-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3b0764 0%, #db2777 60%, #fde047 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+  padding: 2.5rem 2rem;
+  max-width: 350px;
+  width: 100%;
+  text-align: center;
+  border: 3px solid #a78bfa;
+  position: relative;
+  z-index: 1;
+}
+
+.menu-logo {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1rem auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed 0%, #db2777 60%, #fde047 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 24px 0 rgba(123, 34, 255, 0.18);
+  border: 6px solid #fff;
+  animation: spin-slow 8s linear infinite;
+}
+
+.logo-emoji {
+  font-size: 2.8rem;
+  animation: bounce 1.5s infinite alternate;
+}
+
+.menu-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #7c3aed, #db2777, #fde047);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.menu-subtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu-btn {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.9rem 0;
+  border: none;
+  border-radius: 1rem;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(123, 34, 255, 0.10);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+  outline: none;
+}
+
+.menu-btn.purple {
+  background: linear-gradient(90deg, #7c3aed, #db2777);
+}
+.menu-btn.pink {
+  background: linear-gradient(90deg, #db2777, #fde047);
+  color: #fff;
+}
+.menu-btn.yellow {
+  background: linear-gradient(90deg, #fde047, #ef4444);
+  color: #fff;
+}
+.menu-btn.red {
+  background: linear-gradient(90deg, #ef4444, #991b1b);
+  color: #fff;
+}
+
+.menu-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px 0 rgba(123, 34, 255, 0.18);
+  filter: brightness(1.08);
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0);}
+  100% { transform: translateY(-12px);}
+}
