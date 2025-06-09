@@ -1,3 +1,7 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MenuPrincipal from './components/MenuPrincipal';
+import CrearPartida from './components/CrearPartida';
+import UnirsePartida from './components/UnirsePartida';
 import './App.css';
 import axios from 'axios';
 
@@ -9,15 +13,14 @@ const apiCall = () => {
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to My App</h1>
-        <button onClick={apiCall}>Make API Call</button>
-      </header>
-      <p>This is a simple React application.</p>
-      <p>Click the button to make an API call.</p>
-
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MenuPrincipal />} />
+        <Route path="/crear" element={<CrearPartida />} />
+        <Route path="/unirse" element={<UnirsePartida />} />
+        <Route path="/ranking" element={<Ranking />} />
+      </Routes>
+    </Router>
   );
 }
 
