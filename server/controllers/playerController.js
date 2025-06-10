@@ -1,4 +1,11 @@
 //File: server/controllers/playerController.js
+const Player = require('../models/Player');
+const db = require('../config/database');
+
+const players= [];
+
+
+
 exports.registerPlayer = (req, res) => {
     const { nickname } = req.body;
     if (!nickname || typeof nickname !== 'string' || nickname.trim() === '') {
