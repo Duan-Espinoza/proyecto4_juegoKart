@@ -1,21 +1,29 @@
+// File: client/src/components/Auth.jsx
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './Autenticacion.css';
+import '../styles/Auth.css'; 
+import { registerPlayer } from '../services/playerService';
+
 
 export default function Autenticacion() {
   const [nickname, setNickname] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (nickname.trim() !== '') {
-      localStorage.setItem('nickname', nickname);
-      const destino = location.state?.from === 'crear' ? '/crear' : '/unirse';
-      navigate(destino);
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+    try {
+      await registerPlayer(nickname);
+      navigate('/game-config', {
+        state: { nickname }, 
+      });
+    } catch (error) {
+      console.error('Error al registrar el jugador:', error);
+      alert('Error al registrar el jugador. Por favor, inténtalo de nuevo.');
+      return;
     }
-  };
 
+  };
   return (
     <div className="auth-bg">
       <div className="auth-panel">
@@ -24,7 +32,7 @@ export default function Autenticacion() {
         </div>
         <h1 className="auth-title">Bienvenido a Luiki Kart</h1>
         <p className="auth-subtitle">Ingresa tu nickname para continuar</p>
-
+        
         <form onSubmit={handleSubmit} className="auth-form">
           <input
             type="text"
