@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/GameConfig.css"; 
 import ComboBox from "./ui/Combobox";
+import { Button } from "./ui/Button";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function GameConfig() {
@@ -29,13 +30,13 @@ export default function GameConfig() {
       alert("¡Partida iniciada con éxito!");
     }
   };
-  
+
   return (
     <div className="config-bg">
       <div className="config-panel">
-        <button className="config-btn-getBack" onClick={() => navigate("/")}>
+        <Button className="config-btn-getBack" onClick={() => navigate("/")}>
           ←
-        </button>
+        </Button>
         <h1 className="config-title">Configuración de Partida</h1>
         <p className="config-subtitle">Jugador: {nickname}</p>
 
@@ -43,9 +44,10 @@ export default function GameConfig() {
           <ComboBox value={gameType} onChange={setGameType} />
         </div>
 
-        <button className="config-btn" onClick={() => setShowTrackModal(true)}>
+        <Button className="config-btn" onClick={() => setShowTrackModal(true)}>
           Seleccionar pista
-        </button>
+        </Button>
+      
 
         {track && (
           <div className="track-summary">
@@ -55,9 +57,9 @@ export default function GameConfig() {
           </div>
         )}
 
-        <button className="config-btn" onClick={handleStartGame}>
+        <Button className="config-btn" onClick={handleStartGame}>
           Iniciar partida
-        </button>
+        </Button>
       </div>
 
       {showTrackModal && (
@@ -98,12 +100,12 @@ export default function GameConfig() {
             </div>
 
             <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-              <button className="config-btn" onClick={closeModal}>
+              <Button className="config-btn" onClick={closeModal}>
                 Cancelar
-              </button>
-              <button className="config-btn" onClick={saveTrackDetails}>
+              </Button>
+              <Button className="config-btn" onClick={saveTrackDetails}>
                 Guardar
-              </button>
+              </Button>
             </div>
           </div>
         </div>
