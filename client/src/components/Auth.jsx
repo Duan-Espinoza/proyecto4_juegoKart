@@ -15,7 +15,7 @@ export default function Autenticacion() {
     try {
       await registerPlayer(nickname);
       navigate('/game-config', {
-        state: { nickname }, 
+        state: { nickname }, // Pasar el nickname al siguiente componente
       });
     } catch (error) {
       console.error('Error al registrar el jugador:', error);

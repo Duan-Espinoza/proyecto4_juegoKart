@@ -16,11 +16,11 @@
   max-width: 360px;
   width: 100%;
   text-align: center;
-  border: 3px solid #4000ff;
+  border: 0px solid #4000ff;
   position: relative;
   z-index: 1;
 }
-
+/* Posicionar al lado del botón de retroceso */
 .config-title {
   font-size: 2rem;
   font-weight: 900;
@@ -103,4 +103,66 @@
   width: 100%;
   max-width: 400px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.config-modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #4000ff;
+}
+.config-modal p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+.config-modal button {
+  background: #4000ff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.config-modal button:hover {
+  background: #3500cc;
+  transform: translateY(-2px);
+}
+/* Tomar toda la esquina del marco */
+.config-btn-getBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  background: linear-gradient(135deg, #4000ff, #029a28, #008a8f);
+  border: none;
+  color: #fff;
+  font-size: 2.3rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+  border-top-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+}
+
+.config-btn-getBack:hover {
+  color: #3500cc;
+}
+
+.config-btn-getBack i {
+  pointer-events: none;
+}
+.config-btn-getBack:focus {
+  outline: none;
+}
+
+.config-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 1rem;
 }

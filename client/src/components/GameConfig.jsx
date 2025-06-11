@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/GameConfig.css"; 
 import ComboBox from "./ui/Combobox";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function GameConfig() {
   const [gameType, setGameType] = useState("");
@@ -8,6 +9,8 @@ export default function GameConfig() {
   const [track, setTrack] = useState("");
   const [laps, setLaps] = useState("");
   const [players, setPlayers] = useState("");
+  const { nickname } = useLocation().state || {}; // Obtener el nickname del estado de la ubicación
+  const navigate = useNavigate();
 
   const closeModal = () => setShowTrackModal(false);
 
@@ -26,11 +29,15 @@ export default function GameConfig() {
       alert("¡Partida iniciada con éxito!");
     }
   };
-
+  
   return (
     <div className="config-bg">
       <div className="config-panel">
-        <h1 className="config-title">Configuración de partida</h1>
+        <button className="config-btn-getBack" onClick={() => navigate("/")}>
+          ←
+        </button>
+        <h1 className="config-title">Configuración de Partida</h1>
+        <p className="config-subtitle">Jugador: {nickname}</p>
 
         <div className="config-field">
           <ComboBox value={gameType} onChange={setGameType} />
