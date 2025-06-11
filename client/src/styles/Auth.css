@@ -1,0 +1,96 @@
+.auth-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2563eb 0%, #22c55e 50%, #fde047 100%);
+  overflow: hidden;
+}
+
+.auth-panel {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 2rem;
+  padding: 2.5rem 2rem;
+  max-width: 350px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 3px solid #2563eb;
+}
+
+.auth-logo {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1rem auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444 0%, #2563eb 60%, #fde047 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 24px rgba(37, 99, 235, 0.18);
+  border: 6px solid #fff;
+  animation: spin-slow 8s linear infinite;
+}
+
+.logo-emoji {
+  font-size: 2.8rem;
+  animation: bounce 1.5s infinite alternate;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #ef4444, #2563eb, #22c55e, #fde047);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.auth-subtitle {
+  color: #2563eb;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-input {
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  border: 2px solid #2563eb;
+  font-size: 1rem;
+  outline: none;
+}
+
+.auth-btn {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.9rem 0;
+  border: none;
+  border-radius: 1rem;
+  color: #fff;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.auth-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+  filter: brightness(1.05);
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0);}
+  100% { transform: translateY(-12px);}
+}

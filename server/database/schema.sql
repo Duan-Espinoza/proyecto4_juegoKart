@@ -1,3 +1,5 @@
+-- File: server/database/schema.sql
+
 -- Crear la base de datos y seleccionarla
 CREATE DATABASE luiki_kart;
 USE luiki_kart;
