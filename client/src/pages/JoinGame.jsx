@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './UnirsePartida.css';
+import '../styles/JoinGame.css';
 import axios from 'axios';
 
-export default function UnirsePartida() {
+export default function JoinGame() {
   const navigate = useNavigate();
   const nickname = localStorage.getItem('nickname') || 'Invitado';
   const [partidas, setPartidas] = useState([]);

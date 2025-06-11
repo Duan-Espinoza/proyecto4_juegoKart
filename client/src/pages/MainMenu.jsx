@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import './MainMenu.css';
+import '../styles/MainMenu.css'; 
 
 export default function MainMenu() {
   const navigate = useNavigate();
+
 
   return (
     <div className="menu-bg">
@@ -13,10 +14,10 @@ export default function MainMenu() {
         <h1 className="menu-title">Luiki Kart</h1>
         <p className="menu-subtitle">¡Elige una opción para comenzar!</p>
         <div className="menu-buttons">
-          <button className="menu-btn blue" onClick={() => navigate('/auth', { state: { from: 'crear' } })}>
+          <button className="menu-btn blue" onClick={() => navigate('/auth', { state: { from: 'create' } })}>
             🎮 Crear Partida
           </button>
-          <button className="menu-btn green" onClick={() => navigate('/auth', { state: { from: 'unirse' } })}>
+          <button className="menu-btn green" onClick={() => navigate('/auth', { state: { from: 'join' } })}>
             🚗 Unirse a Partida
           </button>
           <button className="menu-btn yellow" onClick={() => navigate('/ranking')}>

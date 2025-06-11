@@ -5,18 +5,28 @@ import '../styles/Auth.css';
 import { registerPlayer } from '../services/playerService';
 
 
-export default function Autenticacion() {
+export default function Auth() {
   const [nickname, setNickname] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
+    const from = location.state?.from;
+
     try {
       await registerPlayer(nickname);
-      navigate('/game-config', {
-        state: { nickname }, // Pasar el nickname al siguiente componente
-      });
+      if (from==='create') {
+        navigate('/game-config', {
+          state: { nickname }, // Pasar el nickname al siguiente componente
+        });
+
+      } else {
+        navigate('/join-game', {
+          state: { nickname }, // Pasar el nickname al siguiente componente
+        });
+      }
+
     } catch (error) {
       console.error('Error al registrar el jugador:', error);
       alert('Error al registrar el jugador. Por favor, inténtalo de nuevo.');

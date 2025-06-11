@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ComboBox({ onChange, value }) {
+export  function ComboBox({ onChange, value }) {
   return (
     <div style={{ marginBottom: "1rem" }}>
       <label htmlFor="gameType" style={{ display: "block", marginBottom: "0.5rem" }}>
@@ -25,3 +25,4 @@ export default function ComboBox({ onChange, value }) {
     </div>
   );
 }
+

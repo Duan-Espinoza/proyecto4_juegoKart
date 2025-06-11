@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/GameConfig.css"; 
-import ComboBox from "./ui/Combobox";
-import { Button } from "./ui/Button";
+import  {Button}  from "../components/Button";
+import {ComboBox} from "../components/ComboBox";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function GameConfig() {
