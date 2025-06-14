@@ -1,5 +1,4 @@
 import React from "react";
-import Autenticacion from "./pages/Auth";
 import GameConfig from "./pages/GameConfig";
 import MainMenu from "./pages/MainMenu";
 import JoinGame from "./pages/JoinGame";

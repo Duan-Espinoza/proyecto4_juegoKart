@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 export  function ComboBox({ onChange, value }) {
   return (
     <div style={{ marginBottom: "1rem" }}>
@@ -25,4 +23,3 @@ export  function ComboBox({ onChange, value }) {
     </div>
   );
 }
-
