@@ -21,20 +21,17 @@ function loadTracksFromFolder(carpetaPath) {
     return tracks;
 }
 
-// Procurar registrar las pistas al iniciar el servidor, y verificar si ya existen en la base de datos
-// Si ya existen, no las vuelve a registrar.
+
 async function registerTracks() {
   const carpeta = path.join(__dirname, '../utils');
   const tracks = loadTracksFromFolder(carpeta);
 
   for (const track of tracks) {
-    // Verificar si la pista ya existe en la base de datos por nombre
     const [rows] = await pool.execute(
       'SELECT id FROM Track WHERE nameTrack = ?',
       [track.nombre]
     );
     if (rows.length > 0) {
-      // Ya existe, no registrar de nuevo
       continue;
     }
 

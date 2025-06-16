@@ -31,12 +31,19 @@ export default function GameConfig() {
   }, []);
 
   const closeModal = () => setShowTrackModal(false);
-
+  
   const saveTrackDetails = () => {
     if (!track || !laps || !players) {
       alert("Por favor, completa todos los campos");
       return;
     }
+
+    // Verificar que la cantidad de los jugadores sea equivalente a la cantidad de carriles de la pista seleccionada
+    if (track.cantidadCarriles !== parseInt(players, 10)) {
+      alert(`La pista ${track.nombre} tiene ${track.cantidadCarriles} carriles. Por favor, selecciona ${track.cantidadCarriles} jugadores.`);
+      return;
+    }
+
     setShowTrackModal(false);
   };
 
@@ -119,7 +126,8 @@ export default function GameConfig() {
               <label>Jugadores:</label>
               <input
                 type="number"
-                min="1"
+                min="2"
+                max="3"
                 value={players}
                 onChange={e => setPlayers(e.target.value)}
                 placeholder="Ej: 2"
