@@ -53,7 +53,12 @@ export default function GameConfig() {
       return;
     }
     alert(`¡Partida iniciada con éxito en la pista ${track.nameTrack}!`);
-    // Aquí puedes agregar navegación o lógica para iniciar el juego
+    navigate("/game-lobby", {
+      state: {
+        nickname,
+        gameType,
+      },
+    });
   };
 
   return (
