@@ -7,6 +7,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const playerRoutes = require('./routes/playerRoutes');
 const db = require('./config/database');
+const gameRoutes = require('./routes/gameRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/register', playerRoutes);
+app.use('/api/games', gameRoutes);
 
 app.listen(port, () => {
   console.log(`El servidor está escuchando en http://localhost:${port}`);
