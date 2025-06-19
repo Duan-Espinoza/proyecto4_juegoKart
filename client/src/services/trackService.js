@@ -8,3 +8,16 @@ export async function fetchTracks() {
         return [];
     }
 }
+
+export async function getIDTrackByName(trackName) {
+    try {
+        const response = await fetch(`http://localhost:3001/api/tracks/${trackName}`);
+        if (!response.ok) throw new Error('Error al obtener ID de pista');
+        const track = await response.json();
+        console.log(`ID de la pista ${trackName}:`, track.id);
+        return track.id;
+    } catch (error) {
+        console.error("Error en getIDTrackByName:", error.message);
+        return null;
+    }
+}

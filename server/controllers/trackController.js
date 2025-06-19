@@ -22,7 +22,23 @@ const registerTracksFromFiles = async (req, res) => {
   }
 };
 
+const getTrackIdByName = async (req, res) => {
+  const trackName = req.params.trackName;
+  try {
+    const trackId = await trackService.getTrackIdByName(trackName);
+    console.log(`Controlador de pistas: ID de pista obtenida para ${trackName}:`, trackId);
+    if (!trackId) {
+      return res.status(404).json({ message: "Pista no encontrada." });
+    }
+    res.json({ id: trackId });
+  } catch (error) {
+    console.error("Error al obtener pista:", error.message);
+    res.status(500).json({ message: "Error interno al obtener pista." });
+  }
+};
+
 module.exports = {
   getAllTracks,
-  registerTracksFromFiles
+  registerTracksFromFiles,
+  getTrackIdByName
 };

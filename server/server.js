@@ -10,6 +10,7 @@ const db = require('./config/database');
 const playerRoutes = require('./routes/playerRoutes');
 const trackRoutes = require('./routes/trackRoutes');
 const trackServices = require('./services/trackService');
+const gameRoutes = require('./routes/gameRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -20,8 +21,9 @@ app.get('/', (req, res) => {
 });
 
 // Rutas
-app.use('/api/register', playerRoutes);
+app.use('/api/player', playerRoutes);
 app.use('/api/tracks', trackRoutes);
+app.use('/api/gameSession', gameRoutes);
 
 app.listen(port, async () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${port}`);

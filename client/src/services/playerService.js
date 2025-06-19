@@ -1,12 +1,12 @@
 //file: client/src/services/playerService.js
-export async function registerPlayer(nickname) {
+export async function registerPlayer(nickname, idTrack) {
     try {
-    const response = await fetch('http://localhost:3001/api/register', {
+    const response = await fetch('http://localhost:3001/api/player/register', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nickname }),
+        body: JSON.stringify({ nickname, idTrack }),
     });
 
     if (!response.ok) {

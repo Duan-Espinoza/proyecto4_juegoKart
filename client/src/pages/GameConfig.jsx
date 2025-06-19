@@ -52,11 +52,14 @@ export default function GameConfig() {
       alert("Por favor, completa todos los campos antes de iniciar la partida");
       return;
     }
-    alert(`¡Partida iniciada con éxito en la pista ${track.nameTrack}!`);
+    alert(`¡Partida iniciada con éxito en la pista ${track.nombre}!`);
     navigate("/game-lobby", {
       state: {
         nickname,
         gameType,
+        track,
+        laps: parseInt(laps, 10),
+        players: parseInt(players, 10),
       },
     });
   };

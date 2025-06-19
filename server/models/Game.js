@@ -1,14 +1,15 @@
 
 class Game {
-    constructor(id, idTrack, gameMode, totalLaps, gameState = 'WAITING', gameTime = null, startDate = null, finishDate = null) {
-        this.id = id;
+    constructor(idTrack, gameMode, totalLaps, hostPlayerId= null, gameState = 'WAITING', gameTime = null, startDate = null, finishDate = null) {
         this.idTrack = idTrack;
         this.gameMode = gameMode; // 'VS' or 'TIEMPO'
         this.totalLaps = totalLaps;
+        this.hostPlayerId = hostPlayerId;
         this.gameState = gameState; // 'WAITING', 'ACTIVE', 'FINISHED'
         this.gameTime = gameTime;
         this.startDate = startDate;
         this.finishDate = finishDate;
+        this.players = []; // Array to hold player objects
     }
 
     start() {
@@ -24,6 +25,15 @@ class Game {
         }
     }
 
+    addPlayer(player) {
+        this.players.push(player);
+    }
+
+    setHostPlayer(playerId) {
+        this.hostPlayerId = playerId;
+    }
+
+
     toDBObject() {
         return {
             id: this.id,
@@ -31,7 +41,7 @@ class Game {
             gameMode: this.gameMode,
             totalLaps: this.totalLaps,
             gameState: this.gameState,
-            gameTime: this.gameTime,
+            gameTime: this.gameTime,    
             startDate: this.startDate,
             finishDate: this.finishDate
         };
@@ -50,3 +60,5 @@ class Game {
         );
     }
 }
+
+module.exports = Game;

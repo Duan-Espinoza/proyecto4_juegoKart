@@ -2,21 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import "../styles/GameLobby.css";
+import { createGameSession } from "../services/gameService";
+import { registerPlayer } from "../services/playerService";
+import { getIDTrackByName } from "../services/trackService";
 
 // Configuración global
 const GAME_TIMEOUT_SECONDS = 180; // tiempo límite configurable (3 minutos)
 
 export default function GameLobby() {
   const navigate = useNavigate();
-  const { nickname } = useLocation().state || {};
-  
+  const {nickname, gameType, track, laps, numPlayers} = useLocation().state || {};
   const [players, setPlayers] = useState([nickname]);
   const [isHost, setIsHost] = useState(true);
   const [gameReady, setGameReady] = useState(false);
   const [timer, setTimer] = useState(GAME_TIMEOUT_SECONDS);
   const [gameCode] = useState(() => generateGameCode());
+  const [idTrack, setIdTrack] = useState(null);
 
+  
   useEffect(() => {
+
     // Simular llegada de jugadores
     const joinTimer = setTimeout(() => {
       setPlayers(prev => [...prev, "Jugador2", "Jugador3"]);
@@ -35,6 +40,40 @@ export default function GameLobby() {
         return prev - 1;
       });
     }, 1000);
+
+    //Crear GameSession en el servidor
+    async function createSession() {
+      try {
+        // Obtener ID de la pista
+        const idTrack = await getIDTrackByName(track.nombre);
+        if (!idTrack) {
+          console.error("Error: No se pudo obtener el ID de la pista.");
+          return;
+        }
+        setIdTrack(idTrack);
+
+        const response = await createGameSession({
+          players,
+          gameType,
+          idTrack,
+          track,
+          laps,
+          numPlayers
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Game session created:", data);
+        } else {
+          console.error("Error creating game session:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error creating game session:", error);
+      }
+    }
+    createSession();
+
+   
 
     return () => {
       clearTimeout(joinTimer);

@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Auth.css'; 
-import { registerPlayer } from '../services/playerService';
 
 
 export default function Auth() {
@@ -15,7 +14,6 @@ export default function Auth() {
     const from = location.state?.from;
 
     try {
-      await registerPlayer(nickname);
       if (from==='create') {
         navigate('/game-config', {
           state: { nickname }, // Pasar el nickname al siguiente componente
