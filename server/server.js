@@ -8,6 +8,15 @@ const { Server } = require('socket.io');
 const playerRoutes = require('./routes/playerRoutes');
 const db = require('./config/database');
 const gameRoutes = require('./routes/gameRoutes');
+// Configuración del servidor Express
+// ...existing code...
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, { cors: { origin: '*' } });
+
+// Configuración de la conexión a la base de datos MySQL
+require('./sockets/game')(io);
 
 app.use(cors());
 app.use(express.json());
@@ -20,7 +29,8 @@ app.use('/api/register', playerRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/players', playerRoutes);
 
-app.listen(port, () => {
+// Se cambia app.listen por server.listen
+server.listen(port, () => {
   console.log(`El servidor está escuchando en http://localhost:${port}`);
 });
 
