@@ -4,5 +4,6 @@ const router = express.Router();
 const playerController = require('../controllers/playerController');
 
 router.post('/', playerController.registerPlayer); 
+router.post('/join', playerController.joinGame);
 
 module.exports = router;

@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/register', playerRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/players', playerRoutes);
 
 app.listen(port, () => {
   console.log(`El servidor está escuchando en http://localhost:${port}`);
