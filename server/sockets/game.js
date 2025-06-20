@@ -6,7 +6,6 @@ module.exports = (io) => {
       socket.join(gameId);
       // Lógica para actualizar jugadores en sala
         
-        
     });
 
     socket.on('playerMove', (data) => {

@@ -16,7 +16,7 @@ async function createGameSession(idTrack, gameType, laps) {
                 newGame.finishDate,
             ]
         );
-
+        console.log('Game session created (backend/services):', result);
         return { sessionId: result.insertId, ...newGame };
     } catch (error) {
         console.error('Error creating game session:', error);

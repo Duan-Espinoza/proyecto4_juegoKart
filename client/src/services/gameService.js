@@ -11,10 +11,12 @@ export async function createGameSession(gameData) {
         if (!response.ok) {
             throw new Error('Error creating game session(client/gameService.js): ');
         }
-        const data = await response.json();
+        const data = await response.json(); 
         console.log('Game session created successfully:', data);
         console.log('Response:', response);
+
         return data;
+    
     } catch (error) {
         console.error(error);
         throw error;

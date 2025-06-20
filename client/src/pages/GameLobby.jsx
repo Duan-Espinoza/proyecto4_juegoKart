@@ -52,7 +52,7 @@ export default function GameLobby() {
         }
         setIdTrack(idTrack);
 
-        const response = await createGameSession({
+        const data = await createGameSession({
           players,
           gameType,
           idTrack,
@@ -61,19 +61,27 @@ export default function GameLobby() {
           numPlayers
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Game session created:", data);
+        console.log("Game session created:", data);
+
+        // Registrar al jugador en la sesión
+        const playerResponse = await registerPlayer({
+          idSession: data.sessionId,
+          nickname: nickname,
+          isHost: true
+        });
+
+        if (playerResponse.ok) {
+          const playerData = await playerResponse.json();
+          console.log("Player registered:", playerData);
+          setIsHost(true); // El jugador que creó la sesión es el host
         } else {
-          console.error("Error creating game session(GameLobby1):", response.statusText, response.status);
+          console.error("Error registering player:", playerResponse.statusText, playerResponse.status);
         }
       } catch (error) {
         console.error("Error creating game session(GameLobby2):", error);
       }
     }
     createSession();
-
-   
 
     return () => {
       clearTimeout(joinTimer);
