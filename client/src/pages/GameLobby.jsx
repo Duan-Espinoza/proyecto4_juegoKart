@@ -65,10 +65,10 @@ export default function GameLobby() {
           const data = await response.json();
           console.log("Game session created:", data);
         } else {
-          console.error("Error creating game session:", response.statusText);
+          console.error("Error creating game session(GameLobby1):", response.statusText, response.status);
         }
       } catch (error) {
-        console.error("Error creating game session:", error);
+        console.error("Error creating game session(GameLobby2):", error);
       }
     }
     createSession();

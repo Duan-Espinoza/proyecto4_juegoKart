@@ -13,6 +13,7 @@ export async function createGameSession(gameData) {
         }
         const data = await response.json();
         console.log('Game session created successfully:', data);
+        console.log('Response:', response);
         return data;
     } catch (error) {
         console.error(error);
