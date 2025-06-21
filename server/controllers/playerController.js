@@ -1,24 +1,30 @@
-//File: server/controllers/playerController.js
-const Player = require('../models/Player');
-const db = require('../config/database');
-
-const players= [];
+const playerService = require('../services/playerService');
 
 
+const registerGamePlayer = async (req, res) => {
+    const { nickname, idSession, isHost } = req.body;
+    console.log('Registering player with data (backend/controllers):', { nickname, idSession, isHost });
+    try {
+        if (!nickname) { return res.status(400).json({ message: 'The nickname is required (backend/controllers).' }); }
+        if (!idSession) {
+            return res.status(400).json({ message: "The session ID is required (backend/controllers)." });
+        }
 
-exports.registerPlayer = (req, res) => {
-    const { nickname } = req.body;
-    if (!nickname || typeof nickname !== 'string' || nickname.trim() === '') {
-        return res.status(400).json({ error: 'Nickname is required and must be a non-empty string.' });
+        const player = await playerService.registerPlayer(idSession, nickname, isHost);
+        if (!player) {
+            console.error("Error al registrar el jugador (backend/controllers): No se pudo crear el jugador.");
+            return res.status(500).json({ message: "Error al registrar el jugador (backend/controllers)." });
+        }
+        console.log('Player registered successfully (backend/controllers):', player);
+        res.status(201).json({ message: "Jugador registrado exitosamente (backend/controllers).", player });
+
+    } catch (error) {
+        console.error("Error al registrar el jugador (backend/controllers):", error.message);
+        res.status(500).json({ message: "Error interno al registrar el jugador (backend/controllers)." });
     }
+};
 
-    console.log(`Registering player with nickname: ${nickname}`);
-
-    res.status(200).json({success: true, message: `Player ${nickname} registered successfully!`});
-}
-
-
-exports.joinGame = async (req, res) => {
+const joinGame = async (req, res) => {
   const { gameId, nickname, vehiculo } = req.body;
   if (!gameId || !nickname) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
@@ -52,4 +58,8 @@ exports.joinGame = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Error al unirse a la partida' });
   }
+};
+module.exports = {
+    registerGamePlayer,
+    joinGame
 };
