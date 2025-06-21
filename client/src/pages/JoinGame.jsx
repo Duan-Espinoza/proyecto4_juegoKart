@@ -13,7 +13,7 @@ export default function JoinGame() {
   useEffect(() => {
     const fetchPartidas = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/games/active');
+        const response = await axios.get('http://localhost:3001/api/games/active');
         setPartidas(response.data);
       } catch (error) {
         console.error('Error al obtener partidas activas:', error);
@@ -27,7 +27,7 @@ export default function JoinGame() {
   const unirse = async () => {
     if (!seleccionada) return;
     try {
-      await axios.post(`http://localhost:5000/api/players/join`, {
+      await axios.post(`http://localhost:3001/api/players/join`, {
         gameId: seleccionada.id,
         nickname,
         vehiculo
