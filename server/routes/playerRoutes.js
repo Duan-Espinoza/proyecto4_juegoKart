@@ -5,5 +5,6 @@ const playerController = require('../controllers/playerController');
 
 // Ruta para registrar un jugador
 router.post('/register', playerController.registerGamePlayer);
+router.post('/join', playerController.joinGame);
 
 module.exports = router;

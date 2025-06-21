@@ -1,0 +1,48 @@
+.waiting-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.waiting-panel {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 8px 32px rgba(30,60,114,0.2);
+  min-width: 350px;
+  text-align: center;
+}
+.waiting-title {
+  font-size: 2.2rem;
+  color: #1e3c72;
+  margin-bottom: 0.5rem;
+}
+.waiting-subtitle {
+  color: #2a5298;
+  margin-bottom: 1.5rem;
+}
+.waiting-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+.waiting-player {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.waiting-vehicle {
+  margin-right: 0.7rem;
+  font-size: 1.5rem;
+}
+.waiting-nickname {
+  font-weight: 500;
+}
+.waiting-message {
+  color: #888;
+  font-size: 1rem;
+  margin-top: 1.5rem;
+}

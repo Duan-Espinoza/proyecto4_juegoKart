@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const app = express();
 const port = 3001;
 const cors = require('cors');
-const { Server } = require('socket.io');
+//const { Server } = require('socket.io');
 
 // Importar archivos de configuración, rutas y servicios
 const db = require('./config/database');
@@ -11,6 +11,13 @@ const playerRoutes = require('./routes/playerRoutes');
 const trackRoutes = require('./routes/trackRoutes');
 const trackServices = require('./services/trackService');
 const gameRoutes = require('./routes/gameRoutes');
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, { cors: { origin: '*' } });
+
+// Configuración de la conexión a la base de datos MySQL
+require('./sockets/game')(io);
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +31,7 @@ app.get('/', (req, res) => {
 app.use('/api/player', playerRoutes);
 app.use('/api/tracks', trackRoutes);
 app.use('/api/gameSession', gameRoutes);
+
 
 app.listen(port, async () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
