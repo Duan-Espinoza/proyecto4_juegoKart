@@ -32,7 +32,7 @@ export default function JoinGame() {
         nickname,
         vehiculo
       });
-      navigate('/juego', { state: { gameId: seleccionada.id } });
+      navigate('/waiting', { state: { gameId: seleccionada.id } });
     } catch (error) {
       console.error('Error al unirse a la partida:', error);
     }
