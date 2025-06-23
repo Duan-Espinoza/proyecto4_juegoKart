@@ -22,3 +22,18 @@ export async function createGameSession(gameData) {
         throw error;
     }
 }
+
+export async function fetchGameSessions() {
+    try {
+        const response = await fetch(`http://localhost:3001/api/gameSession/available`);
+        if (!response.ok) {
+            throw new Error('Error fetching game sessions(client/gameService.js): ');
+        }
+        const data = await response.json();
+        console.log('Game sessions fetched successfully:', data);
+        return data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

@@ -12,4 +12,7 @@ router.post('/register', trackController.registerTracksFromFiles);
 // Obtener una pista por su nombre
 router.get('/:trackName', trackController.getTrackIdByName);
 
+// Obtener una pista por su ID
+router.get('/id/:trackId', trackController.getTrackById);
+
 module.exports = router;

@@ -37,8 +37,23 @@ const getTrackIdByName = async (req, res) => {
   }
 };
 
+const getTrackById = async (req, res) => {
+  const trackId = req.params.trackId;
+  try {
+    const track = await trackService.getTrackById(trackId);
+    if (!track) {
+      return res.status(404).json({ message: "Pista no encontrada." });
+    }
+    res.json(track);
+  } catch (error) {
+    console.error("Error al obtener pista por ID:", error.message);
+    res.status(500).json({ message: "Error interno al obtener pista por ID." });
+  }
+};
+
 module.exports = {
   getAllTracks,
   registerTracksFromFiles,
-  getTrackIdByName
+  getTrackIdByName,
+  getTrackById
 };

@@ -1,6 +1,7 @@
 const db = require('../config/database');
 class Game {
     constructor(idTrack, gameMode, totalLaps, hostPlayerId= null, gameState = 'WAITING', gameTime = null, startDate = null, finishDate = null) {
+        this.id = null; // This will be set when the game is created in the database
         this.idTrack = idTrack;
         this.gameMode = gameMode; // 'VS' or 'TIEMPO'
         this.totalLaps = totalLaps;
@@ -11,6 +12,7 @@ class Game {
         this.finishDate = finishDate;
         this.players = []; // Array to hold player objects
     }
+    
 
     start() {
         this.gameState = 'ACTIVE';
@@ -33,6 +35,9 @@ class Game {
         this.hostPlayerId = playerId;
     }
 
+    setId(id) {
+        this.id = id;
+    }
 
     toDBObject() {
         return {
@@ -48,16 +53,18 @@ class Game {
     }
 
     static fromDatabase(row) {
-        return new Game(
-            row.id,
+        const game = new Game(
             row.idTrack,
             row.gameMode,
             row.totalLaps,
+            row.hostPlayerId,
             row.gameState,
             row.gameTime,
             row.startDate,
             row.finishDate
         );
+        game.setId(row.id);
+        return game;
     }
 }
 

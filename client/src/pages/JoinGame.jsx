@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/JoinGame.css';
-import axios from 'axios';
+import { fetchGameSessions } from '../services/gameService';
+import { getTrackById } from '../services/trackService';
 
 export default function JoinGame() {
   const navigate = useNavigate();
@@ -9,34 +10,33 @@ export default function JoinGame() {
   const [partidas, setPartidas] = useState([]);
   const [vehiculo, setVehiculo] = useState('Rojo');
   const [seleccionada, setSeleccionada] = useState(null);
+  const [tracksInfo, setTracksInfo] = useState({});
 
   useEffect(() => {
-    const fetchPartidas = async () => {
+    async function fetchAndSetPartidas() {
       try {
-        const response = await axios.get('http://localhost:3001/api/games/active');
-        setPartidas(response.data);
+        const gameSessions = await fetchGameSessions();
+        setPartidas(gameSessions);
+
+        const uniqueTrackIds = [...new Set(gameSessions.map(p => p.idTrack))];
+        const trackEntries = await Promise.all(
+          uniqueTrackIds.map(async (id) => {
+            const track = await getTrackById(id);
+            return [id, track];
+          })
+        );
+        const tracksMap = Object.fromEntries(trackEntries);
+        setTracksInfo(tracksMap);
       } catch (error) {
-        console.error('Error al obtener partidas activas:', error);
+        console.error('Error al obtener partidas y pistas:', error);
       }
-    };
-    fetchPartidas();
-    const interval = setInterval(fetchPartidas, 3000);
+    }
+
+    fetchAndSetPartidas();
+
+    const interval = setInterval(fetchAndSetPartidas, 3000);
     return () => clearInterval(interval);
   }, []);
-
-  const unirse = async () => {
-    if (!seleccionada) return;
-    try {
-      await axios.post(`http://localhost:3001/api/players/join`, {
-        gameId: seleccionada.id,
-        nickname,
-        vehiculo
-      });
-      navigate('/waiting', { state: { gameId: seleccionada.id } });
-    } catch (error) {
-      console.error('Error al unirse a la partida:', error);
-    }
-  };
 
   return (
     <div className="join-bg">
@@ -54,29 +54,46 @@ export default function JoinGame() {
           </select>
         </div>
 
-        <div className="partidas-list">
+        <div className="partidas-table-container">
           {partidas.length === 0 ? (
             <p className="join-message">No hay partidas disponibles</p>
           ) : (
-            partidas.map((p) => (
-              <div
-                key={p.id}
-                className={`partida-card ${seleccionada?.id === p.id ? 'seleccionada' : ''}`}
-                onClick={() => setSeleccionada(p)}
-              >
-                <h3>🆔 Código: {p.id}</h3>
-                <p>📍 Pista: {p.track}</p>
-                <p>🎨 Tema: {p.theme}</p>
-                <p>👥 Jugadores: {p.joined} / {p.max_players}</p>
-              </div>
-            ))
+            <table className="partidas-table">
+              <thead>
+                <tr>
+                  <th>Modo</th>
+                  <th>Pista</th>
+                  <th>Jugadores</th>
+                  <th>Vehículo</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {partidas.map(partida => {
+                  const track = tracksInfo[partida.idTrack];
+                  const isSelected = seleccionada === partida.id;
+                  return (
+                    <tr
+                      key={partida.id}
+                      className={isSelected ? 'selected-row' : ''}
+                      onClick={() => setSeleccionada(partida.id)}
+                    >
+                      <td>{partida.gameMode}</td>
+                      <td>{track ? track.nombre : 'Cargando...'}</td>
+                      <td>{partida.players.length} / {track ? track.cantidadCarriles : '...'}</td>
+                      <td>{vehiculo}</td>
+                      <td>{partida.gameState}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
         </div>
 
         <button
           className="join-btn"
           disabled={!seleccionada}
-          onClick={unirse}
         >
           Entrar a la partida 🚀
         </button>

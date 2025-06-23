@@ -21,3 +21,14 @@ export async function getIDTrackByName(trackName) {
         return null;
     }
 }
+
+export async function getTrackById(trackId) {
+    try {
+        const response = await fetch(`http://localhost:3001/api/tracks/id/${trackId}`);
+        if (!response.ok) throw new Error('Error al obtener pista por ID');
+        return await response.json();
+    } catch (error) {
+        console.error("Error en getTrackById:", error.message);
+        return null;
+    }
+}

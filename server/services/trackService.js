@@ -89,9 +89,23 @@ async function getTrackIdByName(trackName) {
     }
 }
 
+async function getTrackById(trackId) {
+    try {
+        const [rows] = await pool.execute('SELECT * FROM Track WHERE id = ?', [trackId]);
+        if (rows.length === 0) {
+            return null; // No se encontró la pista
+        }
+        return Track.fromDatabase(rows[0]); // Retorna una instancia de Track
+    } catch (error) {
+        console.error(`Error al obtener la pista por ID (server/trackService): ${trackId}`, error);
+        throw error;
+    }
+}
+
 module.exports = {
     loadTracksFromFolder,
     registerTracks,
     getAllTracksFromDB,
-    getTrackIdByName
+    getTrackIdByName,
+    getTrackById
 };
