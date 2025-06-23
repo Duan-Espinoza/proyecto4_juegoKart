@@ -64,8 +64,7 @@ export default function JoinGame() {
                   <th>Modo</th>
                   <th>Pista</th>
                   <th>Jugadores</th>
-                  <th>Vehículo</th>
-                  <th>Estado</th>
+                  <th>Vueltas</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,8 +80,7 @@ export default function JoinGame() {
                       <td>{partida.gameMode}</td>
                       <td>{track ? track.nombre : 'Cargando...'}</td>
                       <td>{partida.players.length} / {track ? track.cantidadCarriles : '...'}</td>
-                      <td>{vehiculo}</td>
-                      <td>{partida.gameState}</td>
+                      <td>{partida.totalLaps}</td>
                     </tr>
                   );
                 })}

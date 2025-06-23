@@ -1,7 +1,7 @@
 const Game = require('../models/Game');
 const pool = require('../config/database');
 
-async function createGameSession(idTrack, gameType, laps) {
+async function createGameSession(idTrack, gameType, laps, players) {
     try {
         const newGame = new Game(idTrack, gameType, laps);
         const [result] = await pool.execute(
@@ -17,6 +17,7 @@ async function createGameSession(idTrack, gameType, laps) {
             ]
         );
         newGame.setId(result.insertId); 
+        newGame.setPlayers(players);
         console.log('Game session created (backend/services):', result);
         return { sessionId: result.insertId, ...newGame };
     } catch (error) {
@@ -30,6 +31,11 @@ async function getAvailableGames() {
         const [rows] = await pool.execute('SELECT * FROM Gamesession WHERE gameState = "WAITING"');
         console.log('Available games fetched (backend/services):', rows);
         const games = rows.map(row => Game.fromDatabase(row));
+        // Añadir jugador al juego con mismo ID de sesión
+        for (const game of games) {
+            const [players] = await pool.execute('SELECT * FROM Player WHERE idGame = ?', [game.getId()]);
+            game.setPlayers(players);
+        }
         return games;
     } catch (error) {
         console.error('Error fetching available games:', error);

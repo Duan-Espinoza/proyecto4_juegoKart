@@ -24,7 +24,6 @@ export default function GameLobby() {
 
     // Simular llegada de jugadores
     const joinTimer = setTimeout(() => {
-      setPlayers(prev => [...prev, "Jugador2", "Jugador3"]);
       setGameReady(true);
     }, 3000);
 
@@ -73,13 +72,14 @@ export default function GameLobby() {
         if (playerResponse.ok) {
           const playerData = await playerResponse.json();
           console.log("Player registered:", playerData);
-          setIsHost(true); // El jugador que creó la sesión es el host
+          setIsHost(true);
         } else {
           console.error("Error registering player:", playerResponse.statusText, playerResponse.status);
         }
       } catch (error) {
         console.error("Error creating game session(GameLobby2):", error);
       }
+
     }
     createSession();
 

@@ -3,10 +3,10 @@ const db = require('../config/database');
 
 
 const createGameSession = async (req, res) => {
-    const { idTrack, gameType, laps } = req.body;
-    console.log('Creating game session with data (backend/controllers):', { idTrack, gameType, laps });
+    const { idTrack, gameType, laps, players } = req.body;
+    console.log('Creating game session with data (backend/controllers):', { idTrack, gameType, laps, players });
     try {
-        const gameSession = await gameService.createGameSession(idTrack, gameType, laps);
+        const gameSession = await gameService.createGameSession(idTrack, gameType, laps, players);
         console.log('Game session created successfully (backend/controllers):', gameSession);
         res.status(201).json(gameSession);
     } catch (error) {

@@ -39,6 +39,18 @@ class Game {
         this.id = id;
     }
 
+    setPlayers(players) {
+        this.players = players;
+    }
+
+    getId() {
+        return this.id;
+    }
+
+    getPlayers() {
+        return this.players;
+    }
+
     toDBObject() {
         return {
             id: this.id,
