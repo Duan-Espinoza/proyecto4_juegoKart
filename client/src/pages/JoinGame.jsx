@@ -1,16 +1,30 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/JoinGame.css';
 import { fetchGameSessions } from '../services/gameService';
 import { getTrackById } from '../services/trackService';
+import socket from '../services/socket';
 
 export default function JoinGame() {
   const navigate = useNavigate();
-  const nickname = localStorage.getItem('nickname') || 'Invitado';
+  const { nickname } = useLocation().state || {};
   const [partidas, setPartidas] = useState([]);
   const [vehiculo, setVehiculo] = useState('Rojo');
   const [seleccionada, setSeleccionada] = useState(null);
   const [tracksInfo, setTracksInfo] = useState({});
+
+  useEffect(() => {
+    if (seleccionada && nickname && vehiculo) {
+      const partida = partidas.find(p => p.id === seleccionada);
+      if (partida) {
+        socket.emit('joinRoom', {
+          roomId: partida.id,
+          nickname,
+          vehicle: vehiculo
+        });
+      }
+    }
+  }, [seleccionada, nickname, vehiculo, partidas]);
 
   useEffect(() => {
     async function fetchAndSetPartidas() {
@@ -28,10 +42,9 @@ export default function JoinGame() {
         const tracksMap = Object.fromEntries(trackEntries);
         setTracksInfo(tracksMap);
       } catch (error) {
-        console.error('Error al obtener partidas y pistas:', error);
+        console.error('Error al obtener partidas y pists:', error);
       }
     }
-
     fetchAndSetPartidas();
 
     const interval = setInterval(fetchAndSetPartidas, 3000);

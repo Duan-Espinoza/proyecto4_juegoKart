@@ -8,6 +8,21 @@ import Auth from "./pages/Auth";
 import WaitingRoom from './pages/WaitingRoom';
 
 
+/**
+ * @file App.js
+ * Componente principal de la aplicación que configura el enrutamiento del lado del cliente para el juego.
+ * 
+ * Rutas:
+ * - "/"           : Renderiza el componente MainMenu.
+ * - "/game-config": Renderiza el componente GameConfig.
+ * - "/join-game"  : Renderiza el componente JoinGame.
+ * - "/game-lobby" : Renderiza el componente GameLobby.
+ * - "/waiting"    : Renderiza el componente WaitingRoom.
+ * - "/auth"       : Renderiza el componente Auth.
+ *
+ * @component
+ * @returns {JSX.Element} El enrutador con todas las rutas definidas para la aplicación.
+ */
 function App() {
   return (
     <Router>

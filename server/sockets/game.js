@@ -1,15 +1,26 @@
+/**
+ * Nombre: game.js
+ * Descripción: Configuración de eventos de Socket.io para el juego.
+ * @param {*} io 
+ */
+
 module.exports = (io) => {
   io.on('connection', (socket) => {
-    console.log('Usuario conectado:', socket.id);
-
-    socket.on('joinGame', (gameId) => {
-      socket.join(gameId);
-      // Lógica para actualizar jugadores en sala
-        
+    socket.on('joinRoom', ({ roomId, nickname, vehicle }) => {
+      socket.join(roomId);
+      socket.to(roomId).emit('playerJoined', { nickname, vehicle });
     });
 
-    socket.on('playerMove', (data) => {
-      io.to(data.gameId).emit('updatePosition', data);
+    socket.on('startGame', ({ roomId }) => {
+      io.to(roomId).emit('gameStarted');
+    });
+
+    socket.on('connection', () => {
+      console.log('Cliente conectado:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Cliente desconectado:', socket.id);
     });
   });
 };

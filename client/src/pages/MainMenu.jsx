@@ -3,6 +3,7 @@ import '../styles/MainMenu.css';
 
 export default function MainMenu() {
   const navigate = useNavigate();
+  console.log("URL del backend:", process.env.REACT_APP_API_URL);
 
 
   return (

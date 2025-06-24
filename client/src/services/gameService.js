@@ -1,7 +1,8 @@
-// Recibe 
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 export async function createGameSession(gameData) {
     try {
-        const response = await fetch(`http://localhost:3001/api/gameSession`, {
+        const response = await fetch(`${API_URL}/api/gameSession`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,7 +26,7 @@ export async function createGameSession(gameData) {
 
 export async function fetchGameSessions() {
     try {
-        const response = await fetch(`http://localhost:3001/api/gameSession/available`);
+        const response = await fetch(`${API_URL}/api/gameSession/available`);
         if (!response.ok) {
             throw new Error('Error fetching game sessions(client/gameService.js): ');
         }
