@@ -111,7 +111,7 @@ export default function GameConfig() {
               >
                 <option value="">--Selecciona--</option>
                 {trackOptions.map(t => (
-                  <option key={t.id} value={t.nombre}>
+                  <option key={t.nombre} value={t.nombre}>
                     {t.nombre}
                   </option>
                 ))}

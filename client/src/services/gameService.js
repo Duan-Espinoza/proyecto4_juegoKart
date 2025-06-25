@@ -6,6 +6,7 @@ export async function createGameSession(gameData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true', 
             },
             body: JSON.stringify(gameData),
         });
@@ -26,7 +27,11 @@ export async function createGameSession(gameData) {
 
 export async function fetchGameSessions() {
     try {
-        const response = await fetch(`${API_URL}/api/gameSession/available`);
+        const response = await fetch(`${API_URL}/api/gameSession/available`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true', 
+            },
+        });
         if (!response.ok) {
             throw new Error('Error fetching game sessions(client/gameService.js): ');
         }

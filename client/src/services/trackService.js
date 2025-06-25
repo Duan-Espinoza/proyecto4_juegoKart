@@ -2,7 +2,12 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 export async function fetchTracks() {
     try {
-        const response = await fetch(`${API_URL}/api/tracks`);
+        const response = await fetch(`${API_URL}/api/tracks`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true', 
+            }
+        });
+
         if (!response.ok) throw new Error('Error al obtener pistas');
         return await response.json();
     } catch (error) {
@@ -13,7 +18,11 @@ export async function fetchTracks() {
 
 export async function getIDTrackByName(trackName) {
     try {
-        const response = await fetch(`${API_URL}/api/tracks/${trackName}`);
+        const response = await fetch(`${API_URL}/api/tracks/${trackName}`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true', 
+            }
+        });
         if (!response.ok) throw new Error('Error al obtener ID de pista');
         const track = await response.json();
         console.log(`ID de la pista ${trackName}:`, track.id);
@@ -26,7 +35,12 @@ export async function getIDTrackByName(trackName) {
 
 export async function getTrackById(trackId) {
     try {
-        const response = await fetch(`${API_URL}/api/tracks/id/${trackId}`);
+        const response = await fetch(`${API_URL}/api/tracks/id/${trackId}`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true', 
+            }
+        });
+
         if (!response.ok) throw new Error('Error al obtener pista por ID');
         return await response.json();
     } catch (error) {

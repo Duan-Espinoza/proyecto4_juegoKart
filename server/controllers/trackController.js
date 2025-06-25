@@ -3,6 +3,7 @@ const trackService = require('../services/trackService');
 
 const getAllTracks = async (req, res) => {
   try {
+    console.log("➡️ GET /api/tracks recibido");
     const tracks = await trackService.getAllTracksFromDB();
     console.log("Controlador de pistas: pistas obtenidas correctamente");
     res.json(tracks);
