@@ -14,42 +14,61 @@ export default function JoinGame() {
   const [tracksInfo, setTracksInfo] = useState({});
 
   useEffect(() => {
-    if (seleccionada && nickname && vehiculo) {
-      const partida = partidas.find(p => p.id === seleccionada);
-      if (partida) {
-        socket.emit('joinRoom', {
-          roomId: partida.id,
-          nickname,
-          vehicle: vehiculo
-        });
-      }
-    }
-  }, [seleccionada, nickname, vehiculo, partidas]);
-
-  useEffect(() => {
-    async function fetchAndSetPartidas() {
+    async function fetchAvailableGames() {
       try {
-        const gameSessions = await fetchGameSessions();
-        setPartidas(gameSessions);
-
-        const uniqueTrackIds = [...new Set(gameSessions.map(p => p.idTrack))];
+        const games =await  fetchGameSessions();
+        setPartidas(games);
+        const uniqueTrackIds = [...new Set(games.map(p => p.idTrack))];
         const trackEntries = await Promise.all(
           uniqueTrackIds.map(async (id) => {
             const track = await getTrackById(id);
             return [id, track];
           })
         );
+
         const tracksMap = Object.fromEntries(trackEntries);
         setTracksInfo(tracksMap);
       } catch (error) {
-        console.error('Error al obtener partidas y pists:', error);
+        console.error('Error fetching available games:', error);
+        alert('Error al cargar las partidas disponibles. Inténtalo de nuevo más tarde.');
       }
     }
-    fetchAndSetPartidas();
-
-    const interval = setInterval(fetchAndSetPartidas, 3000);
-    return () => clearInterval(interval);
+    fetchAvailableGames();
   }, []);
+
+  useEffect(() => {
+
+    const handleAvailableGames = (games) => {
+      setPartidas(games);
+
+      const uniqueTrackIds = [...new Set(games.map(p => p.idTrack))];
+      Promise.all(
+        uniqueTrackIds.map(async (id) => {
+          const track = await getTrackById(id);
+          return [id, track];
+        })
+      ).then(trackEntries => {
+        const tracksMap = Object.fromEntries(trackEntries);
+        setTracksInfo(tracksMap);
+      });
+    }
+
+    socket.on('availableGames', handleAvailableGames);
+
+    socket.emit('requestAvailableGames');
+
+    const interval = setInterval(() => {
+      socket.emit('requestAvailableGames');
+    }, 3000); // Actualiza cada 3 segundos
+
+    return () => {
+      socket.off('availableGames', handleAvailableGames);
+      clearInterval(interval);
+    };
+  }, []);
+
+
+
 
   return (
     <div className="join-bg">
@@ -74,10 +93,11 @@ export default function JoinGame() {
             <table className="partidas-table">
               <thead>
                 <tr>
+                  <th>Host</th>
                   <th>Modo</th>
                   <th>Pista</th>
                   <th>Jugadores</th>
-                  <th>Vueltas</th>
+                  <th>Vueltas</th>  
                 </tr>
               </thead>
               <tbody>
@@ -105,6 +125,28 @@ export default function JoinGame() {
         <button
           className="join-btn"
           disabled={!seleccionada}
+          onClick={() => {
+            const partida = partidas.find(p => p.id === seleccionada);
+            if (!partida) {
+              alert("La partida ya no está disponible.");
+              return;
+            }
+
+            socket.emit("joinRoom", {
+              roomId: partida.id,
+              nickname,
+              vehicle: vehiculo
+            });
+
+            navigate("/game-lobby", {
+              state: {
+                nickname,
+                sessionId: partida.id,
+                vehicle: vehiculo,
+                isHost: false,
+              }
+            });
+          }}
         >
           Entrar a la partida 🚀
         </button>

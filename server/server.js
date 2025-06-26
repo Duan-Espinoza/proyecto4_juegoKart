@@ -24,6 +24,9 @@ const app = express();
 const server = http.createServer(app); // Necesario para socket.io
 const io = new Server(server, { cors: { origin: '*' } });
 
+// Asignar el objeto io a la aplicación Express para que esté disponible en las rutas
+app.set("io", io);
+
 // Middlewares globales
 app.use(cors());
 app.use(express.json());

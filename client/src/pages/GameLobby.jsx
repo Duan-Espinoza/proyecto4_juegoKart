@@ -5,7 +5,7 @@ import "../styles/GameLobby.css";
 import { createGameSession } from "../services/gameService";
 import { registerPlayer } from "../services/playerService";
 import { getIDTrackByName } from "../services/trackService";
-import socket from "../services/socket"; // 👈 importar socket
+import socket from "../services/socket";
 
 const GAME_TIMEOUT_SECONDS = 180;
 
@@ -27,6 +27,7 @@ export default function GameLobby() {
         if (prev <= 1) {
           clearInterval(countdown);
           alert("La partida ha expirado. Regresando al inicio.");
+          socket.emit("closeRoom", { roomId: sessionId }); 
           navigate("/");
           return 0;
         }
@@ -35,6 +36,22 @@ export default function GameLobby() {
     }, 1000);
     return () => clearInterval(countdown);
   }, [navigate]);
+
+
+
+  useEffect(() => {
+  socket.on("sessionClosed", ({ roomId }) => {
+    alert("La partida ha sido cerrada.");
+    navigate("/");
+  });
+    return () => socket.off("sessionClosed");
+  }, [navigate]);
+
+  // Botón para cerrar manualmente
+  const handleLeaveAsHost = () => {
+    socket.emit("closeRoom", { roomId: sessionId }); // 🔴 Notifica al backend
+  };
+
 
   //  Crear sesión y unirse a la sala socket
   useEffect(() => {
@@ -94,7 +111,6 @@ export default function GameLobby() {
     };
   }, []);
 
-  // ✔️ Habilitar "Iniciar" cuando estén listos todos
   useEffect(() => {
     if (players.length === numPlayers) {
       setGameReady(true);
@@ -118,6 +134,8 @@ export default function GameLobby() {
       socket.off("gameStarted");
     };
   }, [navigate, players, sessionId, nickname]);
+
+  
 
   const formatTime = (seconds) => {
     const min = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -147,9 +165,12 @@ export default function GameLobby() {
         </Button>
       )}
 
-      <Button className="lobby-exit-btn" onClick={() => navigate("/")}>
-        Salir del Lobby
+      <Button className="lobby-exit-btn" onClick={handleLeaveAsHost}>
+        Cancelar Partida
       </Button>
+
+      
+
     </div>
   );
 }

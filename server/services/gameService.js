@@ -31,7 +31,6 @@ async function getAvailableGames() {
         const [rows] = await pool.execute('SELECT * FROM Gamesession WHERE gameState = "WAITING"');
         console.log('Available games fetched (backend/services):', rows);
         const games = rows.map(row => Game.fromDatabase(row));
-        // Añadir jugador al juego con mismo ID de sesión
         for (const game of games) {
             const [players] = await pool.execute('SELECT * FROM Player WHERE idGame = ?', [game.getId()]);
             game.setPlayers(players);
@@ -43,7 +42,26 @@ async function getAvailableGames() {
     }
 }
 
+async function closeGameSession(roomId) {
+    
+    try {
+        console.log(`Closing game session with id: ${roomId}`);
+        const [result] = await pool.execute('UPDATE Gamesession SET gameState = "CLOSED", finishDate = NOW() WHERE id = ?', [roomId]);
+        if (result.affectedRows > 0) {
+            console.log(`Game session ${roomId} closed successfully.`);
+            return { success: true };
+        } else {
+            console.warn(`No game session found with id ${roomId}.`);
+            return { success: false, message: 'Game session not found.' };
+        }
+    } catch (error) {
+        console.error('Error closing game session:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createGameSession,
-    getAvailableGames
+    getAvailableGames,
+    closeGameSession
 };
