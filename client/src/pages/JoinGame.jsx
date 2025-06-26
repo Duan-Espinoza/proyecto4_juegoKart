@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/JoinGame.css';
 import { fetchGameSessions } from '../services/gameService';
 import { getTrackById } from '../services/trackService';
+import { getHostPlayer } from '../services/playerService';
 import socket from '../services/socket';
 
 export default function JoinGame() {
@@ -12,6 +13,7 @@ export default function JoinGame() {
   const [vehiculo, setVehiculo] = useState('Rojo');
   const [seleccionada, setSeleccionada] = useState(null);
   const [tracksInfo, setTracksInfo] = useState({});
+  const [hostPlayers, setHostPlayers] = useState([]);
 
   useEffect(() => {
     async function fetchAvailableGames() {
@@ -28,6 +30,15 @@ export default function JoinGame() {
 
         const tracksMap = Object.fromEntries(trackEntries);
         setTracksInfo(tracksMap);
+
+        const hostPromises = games.map(async (game) => {
+          const host = await getHostPlayer(game.id);
+          return { gameId: game.id, hostNickname: host.nickName };
+        });
+
+        const hostPlayersData = await Promise.all(hostPromises);
+        setHostPlayers(hostPlayersData);
+
       } catch (error) {
         console.error('Error fetching available games:', error);
         alert('Error al cargar las partidas disponibles. Inténtalo de nuevo más tarde.');
@@ -110,6 +121,9 @@ export default function JoinGame() {
                       className={isSelected ? 'selected-row' : ''}
                       onClick={() => setSeleccionada(partida.id)}
                     >
+                      <td>
+                        {hostPlayers.find(h => h.gameId === partida.id)?.hostNickname || 'Cargando...'}
+                      </td>
                       <td>{partida.gameMode}</td>
                       <td>{track ? track.nombre : 'Cargando...'}</td>
                       <td>{partida.players.length} / {track ? track.cantidadCarriles : '...'}</td>

@@ -28,3 +28,22 @@ export async function registerPlayer(playerData) {
         throw error;    // Propaga el error para manejarlo en el componente
     }
 }
+
+export async function getHostPlayer(sessionId) {
+    try {
+        const response = await fetch(`${API_URL}/api/player/host/${sessionId}`, {
+            headers: {
+                'ngrok-skip-browser-warning': 'true', 
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Error al obtener el jugador host');
+        }
+        const data = await response.json();
+        console.log('Jugador host obtenido exitosamente:', data);
+        return data;   // Devuelve los datos del jugador host
+    } catch (error) {
+        console.error('Error en getHostPlayer:', error);
+        throw error;    // Propaga el error para manejarlo en el componente
+    }
+}
