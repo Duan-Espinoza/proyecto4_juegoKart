@@ -4,6 +4,7 @@ import '../styles/JoinGame.css';
 import { fetchGameSessions } from '../services/gameService';
 import { getTrackById } from '../services/trackService';
 import { getHostPlayer } from '../services/playerService';
+import { registerPlayer } from '../services/playerService';
 import socket from '../services/socket';
 
 export default function JoinGame() {
@@ -145,6 +146,13 @@ export default function JoinGame() {
               alert("La partida ya no está disponible.");
               return;
             }
+            let isHost = false;
+            const success = registerPlayer({idSession: partida.id, nickname:nickname, isHost:isHost});
+            if (!success) {
+              alert("Error al unirse a la partida. Inténtalo de nuevo.");
+              return;
+            }
+
 
             socket.emit("joinRoom", {
               roomId: partida.id,

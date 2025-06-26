@@ -73,7 +73,7 @@ export default function GameLobby() {
 
         await registerPlayer({
           idSession: data.sessionId,
-          nickname,
+          nickname: nickname,
           isHost: true
         });
 

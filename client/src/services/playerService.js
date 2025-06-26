@@ -4,16 +4,22 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
  * Servicio para manejar las operaciones relacionadas con los jugadores.
  * Incluye funciones para registrar un jugador y obtener la lista de jugadores.
  */
-export async function registerPlayer(playerData) {
+export async function registerPlayer({idSession, nickname, isHost}) {
     try {
+        console.log('Registrando jugador con los siguientes datos:', {idSession, nickname, isHost});
 
+    
     const response = await fetch(`${API_URL}/api/player/register`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true', 
         },
-        body: JSON.stringify(playerData),
+        body: JSON.stringify({
+            idSession,
+            nickname,
+            isHost
+        }),
     });
 
     if (!response.ok) {
