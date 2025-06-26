@@ -59,7 +59,17 @@ export default function GameLobby() {
       try {
         const idTrack = await getIDTrackByName(track.nombre);
         setIdTrack(idTrack);
+      
 
+        console.log("Creando sesión de juego con los siguientes datos:", {
+          players: [nickname],
+          gameType,
+          idTrack,
+          track,
+          laps,
+          numPlayers
+        });
+        
         const data = await createGameSession({
           players: [nickname],
           gameType,
@@ -68,6 +78,7 @@ export default function GameLobby() {
           laps,
           numPlayers
         });
+        console.log("Sesión creada:", data);
 
         setSessionId(data.sessionId);
 
@@ -76,6 +87,7 @@ export default function GameLobby() {
           nickname: nickname,
           isHost: true
         });
+
 
         // 💬 Unirse a la sala WebSocket
         socket.emit("joinRoom", {

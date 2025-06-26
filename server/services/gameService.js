@@ -1,5 +1,8 @@
 const Game = require('../models/Game');
 const pool = require('../config/database');
+const { getPlayersBySessionId } = require('./playerService');
+const { getTrackById } = require('./trackService');
+
 
 async function createGameSession(idTrack, gameType, laps, players) {
     try {
@@ -30,17 +33,39 @@ async function getAvailableGames() {
     try {
         const [rows] = await pool.execute('SELECT * FROM Gamesession WHERE gameState = "WAITING"');
         console.log('Available games fetched (backend/services):', rows);
+        // Obtener los juegos disponibles
         const games = rows.map(row => Game.fromDatabase(row));
+
+        // Obtener los jugadores para cada juego y asignarlos a los objetos Game
         for (const game of games) {
             const [players] = await pool.execute('SELECT * FROM Player WHERE idGame = ?', [game.getId()]);
             game.setPlayers(players);
         }
-        return games;
+
+        // Obtener la pistas asociadas a cada juego
+        let availableGames = [];
+        for (const game of games) {
+            const track = await getTrackById(game.idTrack);
+            if (track) {
+                console.log(`Track for game ${game.getId()}:`, track);
+                //Validar que la cantidad de carriles sea igual a la cantidad de jugadores
+                if (track.cantidadCarriles !== game.getPlayers().length) {
+                    availableGames.push(game);
+                } else {
+                    console.warn(`Track ${track.nombre} has ${track.cantidadCarriles} lanes but game has ${game.getPlayers().length} players.`);
+                }
+            }
+        }
+        console.log('Filtered available games:', availableGames);
+        return availableGames;
+
     } catch (error) {
         console.error('Error fetching available games:', error);
         throw error;
     }
 }
+
+
 
 async function closeGameSession(roomId) {
     

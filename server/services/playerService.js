@@ -72,7 +72,32 @@ async function getHostPlayer(sessionId) {
     }
 }
 
+//Funcion que retorna los jugadores de una partida
+async function getPlayersBySessionId(sessionId) {
+    try {
+        console.log("Obteniendo jugadores para la sesión ID:", sessionId, "(backend/services)");
+        // Verificar si el sessionId es válido
+        if (!sessionId || typeof sessionId !== 'number') {
+            throw new Error("El ID de la sesión es obligatorio y debe ser un número");
+        }
+        // Consultar los jugadores de la base de datos
+        const [rows] = await pool.execute(
+            'SELECT * FROM Player WHERE idGame = ?',
+            [sessionId]
+        );
+        if (rows.length === 0) {
+            throw new Error("No se encontraron jugadores para la sesión especificada.");
+        }
+        console.log("Jugadores encontrados (backend/services):", rows);
+        return rows; // Retornar los jugadores encontrados
+    } catch (error) {
+        console.error("Error al obtener jugadores (backend/services):", error.message);
+        throw new Error("Error al obtener jugadores (backend/services).");
+    }
+}
+
 module.exports = {
     registerPlayer,
-    getHostPlayer
+    getHostPlayer,
+    getPlayersBySessionId
 };
