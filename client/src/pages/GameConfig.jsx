@@ -53,7 +53,7 @@ export default function GameConfig() {
       return;
     }
     alert(`¡Partida iniciada con éxito en la pista ${track.nombre}!`);
-    navigate("/game-lobby", {
+    navigate("/game", {
       state: {
         nickname,
         gameType,

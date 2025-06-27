@@ -105,6 +105,20 @@ export default function JoinGame() {
         <button
           className="join-btn"
           disabled={!seleccionada}
+          onClick={() => {
+            const partida = partidas.find(p => p.id === seleccionada);
+            if (partida) {
+              navigate("/game", {
+                state: {
+                  nickname,
+                  partidaId: partida.id,
+                  vehiculo,
+                  track: tracksInfo[partida.idTrack],
+                  // Puedes agregar más datos si lo necesitas
+                }
+              });
+            }
+          }}
         >
           Entrar a la partida 🚀
         </button>

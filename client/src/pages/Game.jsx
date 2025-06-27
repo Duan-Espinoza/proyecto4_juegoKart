@@ -1,11 +1,38 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import socket from "../services/socket";
 import "../styles/Game.css";
 import { useLocation } from "react-router-dom";
 
+// --- DATOS DE PRUEBA ---
+const fakeBoard = [
+  ["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],
+  ["X","L"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","L","X"],
+  ["X"," ","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"," ","X"],
+  ["X"," ","X"," "," "," "," "," "," "," "," "," "," "," "," "," ","X","X"," ","X"],
+  ["X"," ","X"," ","X","X","X","X","X","X","X","X"," ","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," ","X"," "," "," "," "," ","X","X"," ","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," ","X"," ","X","X"," "," ","X","X"," ","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," ","X"," ","X","X"," "," ","X","X"," ","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," ","X"," "," "," "," "," "," "," "," ","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," ","X","X","X","X","X","X","X","X","X","X","X"," ","X","X"," ","X"],
+  ["X"," ","X"," "," "," "," "," "," "," "," "," "," "," "," "," ","X","X"," ","X"],
+  ["X"," ","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"," ","X"],
+  ["X","L"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","L","X"],
+  ["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],
+  ["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"]
+];
+const fakePlayers = [
+  { nickname: "Luigi", x: 1, y: 1, vehicle: "Rojo", lapsCompleted: 1, isReverse: false },
+  { nickname: "Peach", x: 18, y: 1, vehicle: "Azul", lapsCompleted: 2, isReverse: true },
+  { nickname: "Mario", x: 1, y: 12, vehicle: "Verde", lapsCompleted: 0, isReverse: false },
+  { nickname: "Bowser", x: 18, y: 12, vehicle: "Amarillo", lapsCompleted: 1, isReverse: false }
+];
+// --- FIN DATOS DE PRUEBA ---
+
 export default function Game() {
-  const [board, setBoard] = useState([]); // Matriz de la pista
-  const [players, setPlayers] = useState([]); // [{nickname, x, y, direction, vehicle, laps}]
+  // Inicializa con datos de prueba
+  const [board, setBoard] = useState(fakeBoard);
+  const [players, setPlayers] = useState(fakePlayers);
   const [myPlayer, setMyPlayer] = useState(null);
   const [winner, setWinner] = useState(null);
   const [countdown, setCountdown] = useState(null);
@@ -22,13 +49,10 @@ export default function Game() {
     return () => socket.off("gameOver");
   }, []);
 
-
-  // Recibe la pista y posiciones iniciales
   useEffect(() => {
     socket.on("initBoard", ({ board, players }) => {
       setBoard(board);
       setPlayers(players);
-      // Opcional: identifica tu propio jugador
       const myNick = location.state?.nickname;
       if (myNick) {
         const me = players.find(p => p.nickname === myNick);
@@ -38,7 +62,6 @@ export default function Game() {
     return () => socket.off("initBoard");
   }, [location.state]);
 
-  // Escuchar cuenta regresiva y habilitar movimiento
   useEffect(() => {
     socket.on("countdown", ({ value }) => {
       setCountdown(value);
@@ -53,11 +76,9 @@ export default function Game() {
     };
   }, []);
 
-  // Host: presionar "u" para iniciar cuenta regresiva
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "u" || e.key === "U") {
-        // Solo el host debe emitir esto (agrega tu lógica de host aquí)
         socket.emit("startCountdown", { gameId: myPlayer?.gameId });
       }
     };
@@ -65,24 +86,13 @@ export default function Game() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [myPlayer]);
 
-  // Cargar pista y jugadores al montar
-  useEffect(() => {
-    // fetch pista y jugadores iniciales
-  }, []);
-
-  // Escuchar actualizaciones de posiciones
   useEffect(() => {
     socket.on("updatePosition", ({ players }) => {
       setPlayers(players);
-      // Detectar ganador
-      const winner = players.find(p => p.lapsCompleted >= TOTAL_LAPS);
-      if (winner) setWinner(winner.nickname);
     });
     return () => socket.off("updatePosition");
   }, []);
 
-  // Manejar teclas de movimiento
-  // Solo permitir movimiento si canMove es true y no hay ganador
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!canMove || winner) return;
@@ -92,12 +102,12 @@ export default function Game() {
       if (e.key === "ArrowLeft") direction = "left";
       if (e.key === "ArrowRight") direction = "right";
       if (direction) {
-        socket.emit("playerMove", { gameId: myPlayer?.gameId, nickname: myPlayer.nickname, direction });
+        socket.emit("playerMove", { gameId: myPlayer?.gameId, nickname: myPlayer?.nickname, direction });
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [myPlayer, winner]);
+  }, [myPlayer, winner, canMove]);
 
   return (
     <div className="game-bg">
@@ -133,7 +143,6 @@ export default function Game() {
         <div className="game-board">
           {board.map((row, y) =>
             row.map((cell, x) => {
-              // ¿Hay un jugador en esta celda?
               const playerHere = players.find(p => p.x === x && p.y === y);
               return (
                 <div
@@ -164,7 +173,6 @@ export default function Game() {
               </span>
               <span>{p.nickname}</span>
               <span>Vueltas: {p.lapsCompleted}</span>
-              {/* Indicar si va en sentido contrario */}
               {p.isReverse && <span style={{ color: "red", marginLeft: 8 }}>⛔ Sentido contrario</span>}
             </div>
           ))}
