@@ -9,14 +9,15 @@ import socket from "../services/socket";
 
 export default function GameLobby() {
   const navigate = useNavigate();
-  const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime } = useLocation().state || {};
+  const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime, isHostPlayer, vehicle } = useLocation().state || {};
   const [players, setPlayers] = useState([nickname]);
-  const [isHost, setIsHost] = useState(true);
+  const [isHost, setIsHost] = useState(isHostPlayer || false);
   const [gameReady, setGameReady] = useState(false);
   const [idTrack, setIdTrack] = useState(null);
   const [sessionId, setSessionId] = useState(null); // para unirse a la sala
   const [startTime, setStartTime] = useState(null);
   const [timer, setTimer] = useState(0);
+  const [vehicleType, setVehicleType] = useState(vehicle || "Rojo");
   
   useEffect(() => {
     if (initialStartTime) {
@@ -146,10 +147,17 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    if (players.length === numPlayers) {
-      setGameReady(true);
+  if (players.length === numPlayers) {
+    setGameReady(true);
+
+    // 🚀 Iniciar automáticamente si soy host
+    if (isHost && sessionId) {
+      console.log("🎮 Jugadores completos. Iniciando partida automáticamente...");
+      socket.emit("startGame", { roomId: sessionId });
     }
-  }, [players, numPlayers]);
+  }
+}, [players, numPlayers, isHost, sessionId]);
+
 
   // ▶️ Emitir evento de inicio a todos
   const handleStartGame = () => {

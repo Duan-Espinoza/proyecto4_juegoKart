@@ -60,6 +60,8 @@ export default function GameConfig() {
         track,
         laps: parseInt(laps, 10),
         players: parseInt(players, 10),
+        isHostPlayer: true, // Asumimos que el jugador que configura es el host
+        vehicle: "Rojo", // Asignamos un vehículo por defecto
       },
     });
   };
