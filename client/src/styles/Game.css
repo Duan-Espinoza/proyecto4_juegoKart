@@ -61,3 +61,24 @@
   margin-bottom: 1rem;
   font-weight: bold;
 }
+
+.game-countdown {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  font-weight: bold;
+  color: #2563eb;
+  background: rgba(255,255,255,0.85);
+  border-radius: 2rem;
+  padding: 2rem 4rem;
+  z-index: 10;
+  box-shadow: 0 8px 32px rgba(30,60,114,0.2);
+  animation: pop 0.5s;
+}
+@keyframes pop {
+  0% { transform: scale(0.7) translate(-50%, -50%);}
+  80% { transform: scale(1.1) translate(-50%, -50%);}
+  100% { transform: scale(1) translate(-50%, -50%);}
+}

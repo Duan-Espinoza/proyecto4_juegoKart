@@ -82,6 +82,24 @@ module.exports = (io) => {
       console.log('Cliente desconectado:', socket.id);
       // Aquí podrías limpiar el estado si lo deseas
     });
+
+    // Evento para iniciar la cuenta regresiva
+    socket.on('startCountdown', async ({ gameId }) => {
+      // Emitir cuenta regresiva a todos los jugadores de la sala
+      let count = 3;
+      const countdownInterval = setInterval(() => {
+        if (count > 0) {
+          io.to(gameId).emit('countdown', { value: count });
+          count--;
+        } else if (count === 0) {
+          io.to(gameId).emit('countdown', { value: 'GO' });
+          io.to(gameId).emit('canMove', { canMove: true }); // Permitir movimiento
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    });
+
+
   });
 
   console.log('WebSocket configurado y escuchando conexiones.');

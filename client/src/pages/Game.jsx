@@ -7,6 +7,36 @@ export default function Game() {
   const [players, setPlayers] = useState([]); // [{nickname, x, y, direction, vehicle, laps}]
   const [myPlayer, setMyPlayer] = useState(null);
   const [winner, setWinner] = useState(null);
+  const [countdown, setCountdown] = useState(null);
+  const [canMove, setCanMove] = useState(false);
+
+
+  // Escuchar cuenta regresiva y habilitar movimiento
+  useEffect(() => {
+    socket.on("countdown", ({ value }) => {
+      setCountdown(value);
+      if (value === "GO") {
+        setTimeout(() => setCountdown(null), 1000);
+      }
+    });
+    socket.on("canMove", ({ canMove }) => setCanMove(canMove));
+    return () => {
+      socket.off("countdown");
+      socket.off("canMove");
+    };
+  }, []);
+
+  // Host: presionar "u" para iniciar cuenta regresiva
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "u" || e.key === "U") {
+        // Solo el host debe emitir esto (agrega tu lógica de host aquí)
+        socket.emit("startCountdown", { gameId: myPlayer?.gameId });
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [myPlayer]);
 
   // Cargar pista y jugadores al montar
   useEffect(() => {
@@ -24,10 +54,11 @@ export default function Game() {
     return () => socket.off("updatePosition");
   }, []);
 
-  // Manejar teclas
+  // Manejar teclas de movimiento
+  // Solo permitir movimiento si canMove es true y no hay ganador
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (winner) return;
+      if (!canMove || winner) return;
       let direction = null;
       if (e.key === "ArrowUp") direction = "up";
       if (e.key === "ArrowDown") direction = "down";
