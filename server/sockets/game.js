@@ -1,8 +1,3 @@
-//**
- * Nombre: game.js
- * Descripción: Configuración de eventos de Socket.io para el juego y lobby.
- * Unificado para manejar creación de partidas, ingreso a salas, juego y tiempo de inicio.
- */
 
 const fs = require('fs');
 const path = require('path');
