@@ -4,7 +4,8 @@
  * @param {*} io 
  */
 
-// Mapa en memoria para el estado de cada sala de juego
+const fs = require('fs');
+const path = require('path');
 const gameStates = {};
 
 module.exports = (io) => {
@@ -12,27 +13,64 @@ module.exports = (io) => {
     console.log('Cliente conectado:', socket.id);
 
     // Unirse a la sala de juego
-    socket.on('joinGame', ({ gameId, nickname, vehicle }) => {
-      socket.join(gameId);
+    socket.on('joinRoom', async ({ roomId, nickname, vehicle, idTrack }) => {
+      socket.join(roomId);
 
-      // Inicializar estado de juego si no existe
-      if (!gameStates[gameId]) gameStates[gameId] = { players: {} };
+      // Si es el primer jugador, carga la pista y posiciones iniciales
+      if (!gameStates[roomId]) {
+        // Cargar la pista desde la base de datos o archivo JSON
+        // Aquí ejemplo con archivo JSON:
+        const pistaPath = path.join(__dirname, `../utils/pista${idTrack}.json`);
+        const pistaData = JSON.parse(fs.readFileSync(pistaPath, 'utf-8'));
 
-      // Posición inicial (ejemplo: x=0, y=0, dirección 'right')
-      gameStates[gameId].players[nickname] = {
+        // Guardar la pista y posiciones iniciales en el estado de la partida
+        gameStates[roomId] = {
+          board: pistaData.pista,
+          inicioJugadores: pistaData.inicio_jugadores,
+          players: {}
+        };
+      }
+
+      // Asignar posición inicial según el orden de llegada
+      const idx = Object.keys(gameStates[roomId].players).length;
+      const posInicial = gameStates[roomId].inicioJugadores[idx];
+      gameStates[roomId].players[nickname] = {
         nickname,
         vehicle,
-        x: 0,
-        y: 0,
+        x: posInicial.posicion.x,
+        y: posInicial.posicion.y,
         direction: 'right',
         lapsCompleted: 0,
         isReverse: false
       };
 
-      // Notificar a todos los jugadores la lista actualizada
-      io.to(gameId).emit('updatePosition', {
-        players: Object.values(gameStates[gameId].players)
+      // Notificar a todos la lista de jugadores y la pista
+      io.to(roomId).emit('updatePosition', {
+        players: Object.values(gameStates[roomId].players)
       });
+    });
+
+    // Cuando inicia la partida, envía la pista y posiciones iniciales
+    socket.on('startCountdown', ({ gameId }) => {
+      const partida = gameStates[gameId];
+      if (partida) {
+        io.to(gameId).emit('initBoard', {
+          board: partida.board,
+          players: Object.values(partida.players)
+        });
+      }
+      // Emitir cuenta regresiva a todos los jugadores de la sala
+      let count = 3;
+      const countdownInterval = setInterval(() => {
+        if (count > 0) {
+          io.to(gameId).emit('countdown', { value: count });
+          count--;
+        } else if (count === 0) {
+          io.to(gameId).emit('countdown', { value: 'GO' });
+          io.to(gameId).emit('canMove', { canMove: true }); // Permitir movimiento
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
     });
 
     // Movimiento de jugador
@@ -50,9 +88,15 @@ module.exports = (io) => {
       if (direction === 'left') x -= 1;
       if (direction === 'right') x += 1;
 
-      // Validar movimiento (aquí puedes consultar la pista real)
-      // Por simplicidad, solo validamos que no salga del tablero 20x15
-      if (x >= 0 && x < 20 && y >= 0 && y < 15) {
+      // Validar movimiento según la pista
+      const partida = gameStates[gameId];
+      if (
+        partida &&
+        partida.board &&
+        y >= 0 && y < partida.board.length &&
+        x >= 0 && x < partida.board[0].length &&
+        partida.board[y][x] !== 'X' // 'X' es pared
+      ) {
         player.x = x;
         player.y = y;
         // Aquí puedes validar si completó una vuelta y actualizar lapsCompleted
@@ -73,7 +117,7 @@ module.exports = (io) => {
       }
     });
 
-    // Iniciar juego
+    // Iniciar juego (opcional, si lo usas)
     socket.on('startGame', ({ gameId }) => {
       io.to(gameId).emit('gameStarted');
     });
@@ -82,24 +126,6 @@ module.exports = (io) => {
       console.log('Cliente desconectado:', socket.id);
       // Aquí podrías limpiar el estado si lo deseas
     });
-
-    // Evento para iniciar la cuenta regresiva
-    socket.on('startCountdown', async ({ gameId }) => {
-      // Emitir cuenta regresiva a todos los jugadores de la sala
-      let count = 3;
-      const countdownInterval = setInterval(() => {
-        if (count > 0) {
-          io.to(gameId).emit('countdown', { value: count });
-          count--;
-        } else if (count === 0) {
-          io.to(gameId).emit('countdown', { value: 'GO' });
-          io.to(gameId).emit('canMove', { canMove: true }); // Permitir movimiento
-          clearInterval(countdownInterval);
-        }
-      }, 1000);
-    });
-
-
   });
 
   console.log('WebSocket configurado y escuchando conexiones.');

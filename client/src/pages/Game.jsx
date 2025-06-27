@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import socket from "../services/socket";
 import "../styles/Game.css";
+import { useLocation } from "react-router-dom";
 
 export default function Game() {
   const [board, setBoard] = useState([]); // Matriz de la pista
@@ -9,7 +10,23 @@ export default function Game() {
   const [winner, setWinner] = useState(null);
   const [countdown, setCountdown] = useState(null);
   const [canMove, setCanMove] = useState(false);
+  const location = useLocation();
 
+
+  // Recibe la pista y posiciones iniciales
+  useEffect(() => {
+    socket.on("initBoard", ({ board, players }) => {
+      setBoard(board);
+      setPlayers(players);
+      // Opcional: identifica tu propio jugador
+      const myNick = location.state?.nickname;
+      if (myNick) {
+        const me = players.find(p => p.nickname === myNick);
+        setMyPlayer(me);
+      }
+    });
+    return () => socket.off("initBoard");
+  }, [location.state]);
 
   // Escuchar cuenta regresiva y habilitar movimiento
   useEffect(() => {
@@ -78,15 +95,41 @@ export default function Game() {
         <h2 className="game-title">¡A correr!</h2>
         {winner && <div className="game-winner">🏆 Ganador: {winner}</div>}
         <div className="game-board">
-          {/* Renderizar la matriz de la pista y los vehículos */}
+          {board.map((row, y) =>
+            row.map((cell, x) => {
+              // ¿Hay un jugador en esta celda?
+              const playerHere = players.find(p => p.x === x && p.y === y);
+              return (
+                <div
+                  key={`${x}-${y}`}
+                  className={`cell ${cell === "X" ? "wall" : cell === "L" ? "meta" : ""} ${playerHere ? "vehicle" : ""}`}
+                >
+                  {playerHere ? (
+                    <span className="vehicle-icon">
+                      {playerHere.vehicle === "Rojo" && "🚗"}
+                      {playerHere.vehicle === "Azul" && "🚙"}
+                      {playerHere.vehicle === "Verde" && "🛺"}
+                      {playerHere.vehicle === "Amarillo" && "🏎️"}
+                    </span>
+                  ) : cell === "L" ? "🏁" : ""}
+                </div>
+              );
+            })
+          )}
         </div>
         <div className="game-players">
           {players.map(p => (
             <div key={p.nickname} className="player-info">
-              <span className="vehicle-icon">{/* icono según vehículo */}</span>
+              <span className="vehicle-icon">
+                {p.vehicle === "Rojo" && "🚗"}
+                {p.vehicle === "Azul" && "🚙"}
+                {p.vehicle === "Verde" && "🛺"}
+                {p.vehicle === "Amarillo" && "🏎️"}
+              </span>
               <span>{p.nickname}</span>
               <span>Vueltas: {p.lapsCompleted}</span>
               {/* Indicar si va en sentido contrario */}
+              {p.isReverse && <span style={{ color: "red", marginLeft: 8 }}>⛔ Sentido contrario</span>}
             </div>
           ))}
         </div>
