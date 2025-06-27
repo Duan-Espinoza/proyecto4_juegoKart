@@ -7,15 +7,12 @@ import { registerPlayer } from "../services/playerService";
 import { getIDTrackByName } from "../services/trackService";
 import socket from "../services/socket";
 
-const GAME_TIMEOUT_SECONDS = 180;
-
 export default function GameLobby() {
   const navigate = useNavigate();
   const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime } = useLocation().state || {};
   const [players, setPlayers] = useState([nickname]);
   const [isHost, setIsHost] = useState(true);
   const [gameReady, setGameReady] = useState(false);
-  const [gameCode] = useState(() => generateGameCode());
   const [idTrack, setIdTrack] = useState(null);
   const [sessionId, setSessionId] = useState(null); // para unirse a la sala
   const [startTime, setStartTime] = useState(null);
@@ -26,7 +23,7 @@ export default function GameLobby() {
       setStartTime(initialStartTime);
     }
   }, [initialStartTime]);
-  
+
   useEffect(() => {
     socket.on("sessionInfo", ({ startTime }) => {
     const numericStart = Number(startTime);
@@ -183,7 +180,6 @@ useEffect(() => {
   return (
     <div className="lobby-container">
       <h1 className="lobby-title">Lobby de Partida</h1>
-      <p className="lobby-subtitle">Código de partida: <strong>{gameCode}</strong></p>
       <p className="lobby-timer">Tiempo restante: {formatTime(timer)}</p>
 
       <ul className="lobby-player-list">
@@ -205,16 +201,10 @@ useEffect(() => {
       <Button className="lobby-exit-btn" onClick={handleLeaveAsHost}>
         Cancelar Partida
       </Button>
-      <p>🕒 Tiempo UNIX: {startTime}</p>
-
-
       
 
     </div>
   );
 }
 
-function generateGameCode() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
+

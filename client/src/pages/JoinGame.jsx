@@ -34,23 +34,22 @@ export default function JoinGame() {
 }, []);
 
 
-  //  Cuenta regresiva
-useEffect(() => {
-  if (!startTime) return;
+  useEffect(() => {
+    if (!startTime) return;
 
-  const interval = setInterval(() => {
-    const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
-    setTimer(remaining);
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
+      setTimer(remaining);
 
-    if (remaining <= 0) {
-      clearInterval(interval);
-      alert("La partida ha expirado.");
-      navigate("/");
-    }
-  }, 1000);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        alert("La partida ha expirado.");
+        navigate("/");
+      }
+    }, 1000);
 
-  return () => clearInterval(interval);
-}, [startTime]);
+    return () => clearInterval(interval);
+  }, [startTime]);
 
 
   useEffect(() => {
@@ -115,9 +114,6 @@ useEffect(() => {
       clearInterval(interval);
     };
   }, []);
-
-
-
 
   return (
     <div className="join-bg">
@@ -223,7 +219,6 @@ useEffect(() => {
       alert("Error al unirse a la partida.");
     });
 }}
-
         >
           Entrar a la partida 🚀
         </button>
