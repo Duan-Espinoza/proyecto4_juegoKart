@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
 import WaitingRoom from './pages/WaitingRoom';
 import Ranking from "./pages/Ranking";
+import Game from "./pages/Game";
 
 
 /**
@@ -35,6 +36,7 @@ function App() {
         <Route path="/waiting" element={<WaitingRoom />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/game" element={<Game />} />
       </Routes>
     </Router>
   );

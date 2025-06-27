@@ -40,6 +40,11 @@ export default function Game() {
   const location = useLocation();
   const [gameStats, setGameStats] = useState(null);
 
+  // LOG para saber si el componente se monta
+  useEffect(() => {
+    console.log("Game.jsx montado");
+  }, []);
+
   useEffect(() => {
     socket.on("gameOver", (data) => {
       setWinner(data.winner);
@@ -51,8 +56,8 @@ export default function Game() {
 
   useEffect(() => {
     socket.on("initBoard", ({ board, players }) => {
-      setBoard(board);
-      setPlayers(players);
+      setBoard(board && board.length ? board : fakeBoard);
+      setPlayers(players && players.length ? players : fakePlayers);
       const myNick = location.state?.nickname;
       if (myNick) {
         const me = players.find(p => p.nickname === myNick);
@@ -88,7 +93,7 @@ export default function Game() {
 
   useEffect(() => {
     socket.on("updatePosition", ({ players }) => {
-      setPlayers(players);
+      setPlayers(players && players.length ? players : fakePlayers);
     });
     return () => socket.off("updatePosition");
   }, []);
@@ -108,6 +113,16 @@ export default function Game() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [myPlayer, winner, canMove]);
+
+  // Fallback visual si no hay tablero
+  if (!board || !Array.isArray(board) || board.length === 0) {
+    return (
+      <div style={{ color: "red", padding: "2rem", textAlign: "center" }}>
+        <h2>¡Error!</h2>
+        <p>No se pudo cargar el tablero. Intenta recargar la página.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="game-bg">
@@ -163,7 +178,7 @@ export default function Game() {
           )}
         </div>
         <div className="game-players">
-          {players.map(p => (
+          {players && players.length > 0 ? players.map(p => (
             <div key={p.nickname} className="player-info">
               <span className="vehicle-icon">
                 {p.vehicle === "Rojo" && "🚗"}
@@ -175,7 +190,9 @@ export default function Game() {
               <span>Vueltas: {p.lapsCompleted}</span>
               {p.isReverse && <span style={{ color: "red", marginLeft: 8 }}>⛔ Sentido contrario</span>}
             </div>
-          ))}
+          )) : (
+            <div style={{ color: "#888", marginTop: "1rem" }}>No hay jugadores en la partida.</div>
+          )}
         </div>
       </div>
     </div>
