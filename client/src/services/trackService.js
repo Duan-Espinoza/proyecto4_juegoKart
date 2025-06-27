@@ -16,6 +16,15 @@ export async function fetchTracks() {
     }
 }
 
+/**
+ * Obtiene el ID de una pista a partir de su nombre.
+ * Realiza una solicitud HTTP al backend para buscar la pista por nombre y retorna su ID.
+ *
+ * @async
+ * @function
+ * @param {string} trackName - Nombre de la pista a buscar.
+ * @returns {Promise<number|null>} Retorna el ID de la pista si se encuentra, o null si ocurre un error.
+ */
 export async function getIDTrackByName(trackName) {
     try {
         const response = await fetch(`${API_URL}/api/tracks/${trackName}`, {

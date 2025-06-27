@@ -1,5 +1,14 @@
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+/**
+ * Crea una nueva sesión de juego enviando los datos del juego al servidor.
+ * 
+ * @async
+ * @function
+ * @param {Object} gameData - Los datos de la sesión de juego a crear.
+ * @returns {Promise<Object>} Los datos de la sesión de juego creada.
+ * @throws {Error} Lanza un error si ocurre un problema al crear la sesión de juego.
+ */
 export async function createGameSession(gameData) {
     try {
         const response = await fetch(`${API_URL}/api/gameSession`, {

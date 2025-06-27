@@ -5,6 +5,34 @@ import { ComboBox } from "../components/ComboBox";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchTracks } from "../services/trackService";
 
+/**
+ * Componente GameConfig
+ * 
+ * Este componente permite al usuario configurar una partida antes de iniciarla.
+ * Permite seleccionar el tipo de juego, la pista, el número de vueltas y la cantidad de jugadores.
+ * 
+ * Características principales:
+ * - Carga dinámica de pistas disponibles desde el backend.
+ * - Validación para asegurar que la cantidad de jugadores coincida con los carriles de la pista seleccionada.
+ * - Modal para seleccionar detalles de la pista, vueltas y jugadores.
+ * - Navegación hacia el lobby del juego una vez que la configuración es válida.
+ * 
+ * Props: Ninguna (utiliza navegación y estado global/local).
+ * 
+ * Estado interno:
+ * - gameType: Tipo de juego seleccionado.
+ * - showTrackModal: Booleano para mostrar/ocultar el modal de selección de pista.
+ * - track: Objeto de la pista seleccionada.
+ * - laps: Número de vueltas.
+ * - players: Número de jugadores.
+ * - trackOptions: Lista de pistas disponibles.
+ * 
+ * Navegación:
+ * - Recibe el nickname del jugador desde el estado de navegación.
+ * - Redirige al lobby del juego con la configuración seleccionada.
+ * 
+ * @component
+ */
 export default function GameConfig() {
   const [gameType, setGameType] = useState("");
   const [showTrackModal, setShowTrackModal] = useState(false);

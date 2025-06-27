@@ -7,6 +7,32 @@ import { getHostPlayer } from '../services/playerService';
 import { registerPlayer } from '../services/playerService';
 import socket from '../services/socket';
 
+/**
+ * Componente JoinGame
+ * 
+ * Este componente permite a un usuario unirse a una partida existente en el juego de karts.
+ * 
+ * Funcionalidades principales:
+ * - Muestra una lista de partidas disponibles, actualizándose en tiempo real mediante sockets.
+ * - Permite seleccionar un vehículo antes de unirse a la partida.
+ * - Muestra información relevante de cada partida: host, modo de juego, pista, número de jugadores y vueltas.
+ * - Gestiona la lógica de unión a la partida, incluyendo el registro del jugador y la navegación al lobby del juego.
+ * - Controla el tiempo de inicio de la partida y alerta si la sesión ha expirado.
+ * 
+ * Hooks utilizados:
+ * - useState: para manejar el estado de partidas, vehículo seleccionado, partida seleccionada, información de pistas, hosts, tiempo de inicio y temporizador.
+ * - useEffect: para gestionar la suscripción a eventos de sockets, la actualización periódica de partidas y el temporizador de la sesión.
+ * 
+ * Props:
+ * - No recibe props directamente, pero utiliza el nickname recibido a través del estado de navegación.
+ * 
+ * Dependencias externas:
+ * - socket: para comunicación en tiempo real con el servidor.
+ * - fetchGameSessions, getTrackById, getHostPlayer, registerPlayer: funciones para interactuar con la API del backend.
+ * - useNavigate, useLocation: hooks de react-router-dom para navegación y acceso al estado de la ruta.
+ * 
+ * @component
+ */
 export default function JoinGame() {
   const navigate = useNavigate();
   const { nickname } = useLocation().state || {};
@@ -174,21 +200,21 @@ export default function JoinGame() {
           className="join-btn"
           disabled={!seleccionada}
           onClick={() => {
-  const partida = partidas.find(p => p.id === seleccionada);
-  if (!partida) {
-    alert("La partida ya no está disponible.");
-    return;
-  }
+          const partida = partidas.find(p => p.id === seleccionada);
+          if (!partida) {
+            alert("La partida ya no está disponible.");
+          return;
+          }
 
-  const isHost = false;
-  registerPlayer({ idSession: partida.id, nickname, isHost })
-    .then(() => {
-      // 🔊 Emitimos joinRoom
-      socket.emit("joinRoom", {
-        roomId: partida.id,
-        nickname,
-        vehicle: vehiculo
-      });
+          const isHost = false;
+          registerPlayer({ idSession: partida.id, nickname, isHost })
+          .then(() => {
+            // 🔊 Emitimos joinRoom
+            socket.emit("joinRoom", {
+            roomId: partida.id,
+            nickname,
+            vehicle: vehiculo
+          });
 
       //🕒 Esperamos a recibir el startTime antes de navegar
       const handleSessionInfo = ({ startTime }) => {
@@ -212,7 +238,13 @@ export default function JoinGame() {
         socket.off("sessionInfo", handleSessionInfo); // Limpiar listener
       };
 
-      socket.on("sessionInfo", handleSessionInfo);
+      socket.on("sessionInfo", handleSessionInfo);// Escuchar el evento sessionInfo
+      socket.emit("validateJoin", {
+        roomId: partida.id,
+        nickname,
+        vehicle: vehiculo
+      });
+
     })
     .catch((error) => {
       console.error("Error al registrar jugador:", error);

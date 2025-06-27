@@ -7,6 +7,51 @@ import { registerPlayer } from "../services/playerService";
 import { getIDTrackByName } from "../services/trackService";
 import socket from "../services/socket";
 
+/**
+ * Componente GameLobby
+ * 
+ * Este componente representa la sala de espera ("lobby") de una partida multijugador de un juego de karts.
+ * Permite a los jugadores unirse a la sala, muestra la lista de jugadores conectados, 
+ * gestiona la cuenta regresiva hasta el inicio de la partida y permite al anfitrión iniciar o cancelar la partida.
+ * 
+ * Funcionalidades principales:
+ * - Creación y gestión de la sesión de juego.
+ * - Escucha de eventos de nuevos jugadores, inicio y cierre de la partida mediante sockets.
+ * - Muestra el temporizador de inicio y la lista de jugadores conectados.
+ * - Permite al anfitrión iniciar la partida automáticamente cuando se completa el número de jugadores.
+ * - Permite cancelar la partida y regresar al menú principal.
+ * 
+ * Props: No recibe props directamente, utiliza el estado de navegación (useLocation) para obtener los datos iniciales.
+ * 
+ * Estado:
+ * - players: Lista de jugadores conectados.
+ * - isHost: Indica si el usuario actual es el anfitrión.
+ * - gameReady: Indica si la partida está lista para iniciar.
+ * - idTrack: ID de la pista seleccionada.
+ * - sessionId: ID de la sesión de juego.
+ * - startTime: Tiempo de inicio de la partida.
+ * - timer: Tiempo restante para el inicio de la partida.
+ * - vehicleType: Tipo de vehículo seleccionado por el jugador.
+ * 
+ * Hooks utilizados:
+ * - useEffect: Para gestionar la suscripción a eventos de sockets y el ciclo de vida del componente.
+ * - useState: Para manejar el estado interno del lobby.
+ * - useNavigate, useLocation: Para navegación y obtención de datos de la ruta.
+ * 
+ * Eventos de socket escuchados:
+ * - "sessionInfo": Recibe información de la sesión, incluyendo el tiempo de inicio.
+ * - "sessionClosed": Notifica el cierre de la sala.
+ * - "playerJoined": Notifica la llegada de un nuevo jugador.
+ * - "gameStarted": Indica el inicio de la partida.
+ * 
+ * Eventos de socket emitidos:
+ * - "joinRoom": Unirse a la sala.
+ * - "createRoom": Crear una nueva sala.
+ * - "closeRoom": Cerrar la sala (solo anfitrión).
+ * - "startGame": Iniciar la partida (solo anfitrión).
+ * 
+ * @component
+ */
 export default function GameLobby() {
   const navigate = useNavigate();
   const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime, isHostPlayer, vehicle } = useLocation().state || {};
@@ -119,7 +164,6 @@ useEffect(() => {
 
         socket.emit("createRoom", { roomId: data.sessionId });
 
-        setIsHost(true);
       } catch (error) {
         console.error("Error creando partida:", error);
       }

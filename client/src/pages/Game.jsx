@@ -3,6 +3,41 @@ import socket from "../services/socket";
 import "../styles/Game.css";
 import { useLocation } from "react-router-dom";
 
+/**
+ * Componente Game para el juego de carreras de karts.
+ * Maneja el estado del juego, posiciones de los jugadores, renderizado del tablero, cuenta regresiva y detección de ganador.
+ *
+ * @componente
+ *
+ * @returns {JSX.Element} La interfaz de usuario del juego renderizada.
+ *
+ * @ejemplo
+ * <Game />
+ *
+ * @descripción
+ * - Escucha eventos de socket para la inicialización del tablero, cuenta regresiva, movimiento de jugadores y fin de partida.
+ * - Renderiza el tablero del juego, los vehículos de los jugadores y las estadísticas de la partida.
+ * - Permite al host iniciar la cuenta regresiva con la tecla "u".
+ * - Maneja el movimiento del jugador con las flechas cuando está permitido.
+ *
+ * @estado
+ * @property {Array<Array<string>>} board - Matriz de la pista.
+ * @property {Array<Object>} players - Lista de objetos jugador ({nickname, x, y, direction, vehicle, lapsCompleted, isReverse}).
+ * @property {Object|null} myPlayer - El objeto del jugador actual.
+ * @property {string|null} winner - El nickname del jugador ganador.
+ * @property {number|string|null} countdown - Valor de la cuenta regresiva o "GO".
+ * @property {boolean} canMove - Si el jugador puede moverse.
+ * @property {Object|null} gameStats - Estadísticas de la partida al finalizar.
+ *
+ * @escucha socket#initBoard - Recibe el tablero inicial y posiciones de los jugadores.
+ * @escucha socket#gameOver - Recibe el evento de fin de partida y estadísticas.
+ * @escucha socket#countdown - Recibe actualizaciones de la cuenta regresiva.
+ * @escucha socket#canMove - Recibe permiso de movimiento.
+ * @escucha socket#updatePosition - Recibe actualizaciones de posiciones de jugadores.
+ *
+ * @emite socket#startCountdown - El host emite para iniciar la cuenta regresiva.
+ * @emite socket#playerMove - Emite la dirección de movimiento del jugador.
+ */
 export default function Game() {
   const [board, setBoard] = useState([]); // Matriz de la pista
   const [players, setPlayers] = useState([]); // [{nickname, x, y, direction, vehicle, laps}]

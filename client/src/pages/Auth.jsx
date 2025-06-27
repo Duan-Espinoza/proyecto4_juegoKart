@@ -4,6 +4,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Auth.css'; 
 
 
+/**
+ * Componente Auth para gestionar la autenticación del usuario mediante un nickname.
+ *
+ * Este componente muestra un formulario donde el usuario puede ingresar su nickname
+ * para continuar con el flujo de creación o unión a una partida, según el estado de navegación.
+ * Al enviar el formulario, el nickname se pasa a la siguiente ruta utilizando el estado de navegación
+ * de React Router. Maneja errores de navegación y proporciona retroalimentación al usuario.
+ *
+ * @component
+ *
+ * @example
+ * // Uso en una ruta
+ * <Route path="/auth" element={<Auth />} />
+ *
+ * @returns {JSX.Element} Interfaz de formulario de autenticación renderizada.
+ */
 export default function Auth() {
   const [nickname, setNickname] = useState('');
   const navigate = useNavigate();

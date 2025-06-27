@@ -1,6 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import '../styles/MainMenu.css'; 
 
+/**
+ * Componente principal del menú de inicio de Luiki Kart.
+ *
+ * Muestra el logo, el título del juego y varias opciones para el usuario:
+ * - Crear una nueva partida (redirige a la autenticación con intención de crear).
+ * - Unirse a una partida existente (redirige a la autenticación con intención de unirse).
+ * - Ver el ranking de jugadores.
+ * - Salir de la aplicación.
+ *
+ * Utiliza `useNavigate` de React Router para la navegación entre páginas.
+ *
+ * @component
+ */
 export default function MainMenu() {
   const navigate = useNavigate();
   console.log("URL del backend:", process.env.REACT_APP_API_URL);

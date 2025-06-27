@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import "../styles/Ranking.css";
  
+/**
+ * Componente Ranking
+ *
+ * Muestra una tabla con el ranking de partidas finalizadas, incluyendo información
+ * sobre el ganador, tiempo, pista, vueltas e ID de la partida. Los tres primeros lugares
+ * se destacan con emojis de podio. Si no hay partidas finalizadas, muestra un mensaje indicativo.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} Panel con el ranking de partidas.
+ */
 export default function Ranking() {
   const [ranking, setRanking] = useState([]);
  
