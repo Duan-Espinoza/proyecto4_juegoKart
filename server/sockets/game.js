@@ -68,7 +68,7 @@ module.exports = (io) => {
     });
 
     // Evento para unirse al juego real (cargar pista, asignar posiciones)
-    socket.on('joinRoom', async ({ roomId, nickname, vehicle, idTrack }) => {
+    socket.on('joinGame', async ({ roomId, nickname, vehicle, idTrack }) => {
       socket.join(roomId);
 
       if (!gameStates[roomId]) {
