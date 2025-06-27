@@ -1,0 +1,30 @@
+.ranking-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fbbf24 0%, #2563eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ranking-panel {
+  background: #fff;
+  border-radius: 2rem;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(30,60,114,0.2);
+  min-width: 700px;
+  text-align: center;
+}
+.ranking-title {
+  font-size: 2rem;
+  color: #1e3c72;
+  margin-bottom: 1rem;
+}
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.ranking-table th, .ranking-table td {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}

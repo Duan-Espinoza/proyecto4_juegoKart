@@ -18,15 +18,19 @@ const playerRoutes = require('./routes/playerRoutes');
 const trackRoutes = require('./routes/trackRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const setupSocketHandlers = require('./sockets/game'); // función exportada que recibe `io`
+const rankingRoutes = require('./routes/rankingRoutes');
 
 // Configuración del servidor Express + Socket.io
 const app = express();
 const server = http.createServer(app); // Necesario para socket.io
 const io = new Server(server, { cors: { origin: '*' } });
 
+
+
 // Middlewares globales
 app.use(cors());
 app.use(express.json());
+app.use('/api/ranking', rankingRoutes);
 
 // Rutas REST
 app.use('/api/player', playerRoutes);

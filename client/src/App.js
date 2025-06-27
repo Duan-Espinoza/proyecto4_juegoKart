@@ -6,6 +6,7 @@ import GameLobby from "./pages/GameLobby";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
 import WaitingRoom from './pages/WaitingRoom';
+import Ranking from "./pages/Ranking";
 
 
 /**
@@ -32,6 +33,7 @@ function App() {
         <Route path="/join-game" element={<JoinGame />} />
         <Route path="/game-lobby" element={<GameLobby />} />
         <Route path="/waiting" element={<WaitingRoom />} />
+        <Route path="/ranking" element={<Ranking />} />
         <Route path="/auth" element={<Auth />} />
       </Routes>
     </Router>
