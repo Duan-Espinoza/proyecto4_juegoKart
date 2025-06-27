@@ -27,8 +27,18 @@ module.exports = (io) => {
         gameStates[roomId] = {
           board: pistaData.pista,
           inicioJugadores: pistaData.inicio_jugadores,
-          players: {}
+          players: {},
+          interval: null 
         };
+
+
+        // Iniciar intervalo para emitir posiciones cada 0.5s
+        gameStates[roomId].interval = setInterval(() => {
+          io.to(roomId).emit('updatePosition', {
+            players: Object.values(gameStates[roomId].players)
+          });
+        }, 500);
+
       }
 
       // Asignar posición inicial según el orden de llegada
@@ -97,6 +107,13 @@ module.exports = (io) => {
         x >= 0 && x < partida.board[0].length &&
         partida.board[y][x] !== 'X' // 'X' es pared
       ) {
+
+        // Detectar sentido contrario (ejemplo simple)
+        // Supón que la dirección correcta es 'right'
+        const direccionCorrecta = 'right'; // Puedes obtener esto de la pista real
+        player.isReverse = (direction !== direccionCorrecta);
+
+
         player.x = x;
         player.y = y;
         // Aquí puedes validar si completó una vuelta y actualizar lapsCompleted
