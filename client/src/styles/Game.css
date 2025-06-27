@@ -62,6 +62,24 @@
   font-weight: bold;
 }
 
+.game-stats {
+  margin-top: 2rem;
+  background: #f3f4f6;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px #0001;
+}
+.game-stats table {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+.game-stats th, .game-stats td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
 .game-countdown {
   position: absolute;
   top: 40%;

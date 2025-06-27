@@ -84,6 +84,7 @@ module.exports = (io) => {
     });
 
     // Movimiento de jugador
+    // Movimiento de jugador
     socket.on('playerMove', ({ gameId, nickname, direction }) => {
       const player = gameStates[gameId]?.players[nickname];
       if (!player) return;
@@ -107,20 +108,18 @@ module.exports = (io) => {
         x >= 0 && x < partida.board[0].length &&
         partida.board[y][x] !== 'X' // 'X' es pared
       ) {
-
         // Detectar sentido contrario (ejemplo simple)
-        // Supón que la dirección correcta es 'right'
         const direccionCorrecta = 'right'; // Puedes obtener esto de la pista real
         player.isReverse = (direction !== direccionCorrecta);
-
 
         player.x = x;
         player.y = y;
         // Aquí puedes validar si completó una vuelta y actualizar lapsCompleted
+        // Por ejemplo, si pasa por la meta (celda 'L'):
+        if (partida.board[y][x] === 'L') {
+          player.lapsCompleted += 1;
+        }
       }
-
-      // Ejemplo: detectar sentido contrario (ajusta según tu lógica de pista)
-      player.isReverse = false; // Cambia a true si detectas sentido contrario
 
       // Notificar a todos los jugadores la lista actualizada
       io.to(gameId).emit('updatePosition', {
@@ -128,11 +127,36 @@ module.exports = (io) => {
       });
 
       // Validar si hay ganador (ejemplo: 3 vueltas)
-      const winner = Object.values(gameStates[gameId].players).find(p => p.lapsCompleted >= 3);
+      const totalLaps = 3; // O usa el valor real de la partida
+      const winner = Object.values(gameStates[gameId].players).find(p => p.lapsCompleted >= totalLaps);
+
       if (winner) {
-        io.to(gameId).emit('gameWinner', { winner: winner.nickname });
+        // Calcular estadísticas
+        const stats = Object.values(gameStates[gameId].players).map(p => ({
+          nickname: p.nickname,
+          vehicle: p.vehicle,
+          lapsCompleted: p.lapsCompleted,
+          // Puedes agregar tiempo si lo llevas
+        }));
+
+        // Guardar en la base de datos (ejemplo simple)
+        // Aquí deberías usar tu modelo y lógica real para insertar en Ranking
+        // await db.query('INSERT INTO Ranking ...', [...]);
+
+        io.to(gameId).emit('gameOver', {
+          winner: winner.nickname,
+          stats,
+          track: partida.board, // O el nombre/id de la pista
+          gameId,
+          totalLaps
+        });
+
+        // Limpiar el intervalo de la sala
+        if (partida.interval) clearInterval(partida.interval);
+        delete gameStates[gameId];
       }
     });
+
 
     // Iniciar juego (opcional, si lo usas)
     socket.on('startGame', ({ gameId }) => {

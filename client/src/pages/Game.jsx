@@ -11,6 +11,16 @@ export default function Game() {
   const [countdown, setCountdown] = useState(null);
   const [canMove, setCanMove] = useState(false);
   const location = useLocation();
+  const [gameStats, setGameStats] = useState(null);
+
+  useEffect(() => {
+    socket.on("gameOver", (data) => {
+      setWinner(data.winner);
+      setGameStats(data);
+      setCanMove(false);
+    });
+    return () => socket.off("gameOver");
+  }, []);
 
 
   // Recibe la pista y posiciones iniciales
@@ -94,6 +104,32 @@ export default function Game() {
       <div className="game-panel">
         <h2 className="game-title">¡A correr!</h2>
         {winner && <div className="game-winner">🏆 Ganador: {winner}</div>}
+        {gameStats && (
+          <div className="game-stats">
+            <h3>Estadísticas de la partida</h3>
+            <p><strong>Pista:</strong> {typeof gameStats.track === "string" ? gameStats.track : "Pista"}</p>
+            <p><strong>ID de partida:</strong> {gameStats.gameId}</p>
+            <p><strong>Vueltas:</strong> {gameStats.totalLaps}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Jugador</th>
+                  <th>Vehículo</th>
+                  <th>Vueltas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gameStats.stats.map((p, idx) => (
+                  <tr key={idx}>
+                    <td>{p.nickname}</td>
+                    <td>{p.vehicle}</td>
+                    <td>{p.lapsCompleted}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
         <div className="game-board">
           {board.map((row, y) =>
             row.map((cell, x) => {
