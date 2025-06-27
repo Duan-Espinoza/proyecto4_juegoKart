@@ -5,6 +5,7 @@
  */
 
 const gameService = require('../services/gameService'); // Servicio que maneja DB
+const roomStartTimes = {}; // ya debe existir globalmente
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
@@ -20,11 +21,24 @@ module.exports = (io) => {
       }
     });
 
-    // Unirse a una sala
-    socket.on('joinRoom', ({ roomId, nickname, vehicle }) => {
+    // Jugador se une
+  socket.on("joinRoom", async ({ roomId, nickname, vehicle }) => {
+    try {
       socket.join(roomId);
-      socket.to(roomId).emit('playerJoined', { nickname, vehicle });
-    });
+
+      const startTime = roomStartTimes[roomId]; // 🔥 Aquí sí debería existir
+      if (!startTime) {
+        console.warn(`⚠️ No hay startTime definido para la sala ${roomId}`);
+      }
+
+      socket.emit("sessionInfo", { startTime });
+
+      socket.to(roomId).emit("playerJoined", { nickname, vehicle });
+    } catch (err) {
+      console.error("Error en joinRoom:", err);
+    }
+  });
+
 
     // Cerrar sala (usado por el host)
     socket.on("closeRoom", async ({ roomId }) => {
@@ -43,6 +57,18 @@ module.exports = (io) => {
         console.error("❌ Error cerrando la partida:", error);
       }
     });
+
+    socket.on("createRoom", ({ roomId }) => {
+    const GAME_TIMEOUT_MS = 180 * 1000;
+    const startTime = Date.now() + GAME_TIMEOUT_MS;
+    console.log(`🟢 Creando sala: ${roomId} con tiempo de inicio: ${startTime}`);
+    roomStartTimes[roomId] = startTime;
+
+    socket.join(roomId);
+    socket.emit("sessionInfo", { startTime });
+  });
+
+
 
     // Inicio de la partida
     socket.on('startGame', ({ roomId }) => {

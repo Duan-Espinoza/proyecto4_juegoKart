@@ -34,9 +34,6 @@ const getAvailableGames = async (req, res) => {
 };
 
 
-
-
-
 module.exports = {
   createGameSession,
   getAvailableGames

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import "../styles/GameLobby.css";
@@ -11,31 +11,56 @@ const GAME_TIMEOUT_SECONDS = 180;
 
 export default function GameLobby() {
   const navigate = useNavigate();
-  const { nickname, gameType, track, laps, numPlayers } = useLocation().state || {};
+  const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime } = useLocation().state || {};
   const [players, setPlayers] = useState([nickname]);
   const [isHost, setIsHost] = useState(true);
   const [gameReady, setGameReady] = useState(false);
-  const [timer, setTimer] = useState(GAME_TIMEOUT_SECONDS);
   const [gameCode] = useState(() => generateGameCode());
   const [idTrack, setIdTrack] = useState(null);
   const [sessionId, setSessionId] = useState(null); // para unirse a la sala
+  const [startTime, setStartTime] = useState(null);
+  const [timer, setTimer] = useState(0);
+  
+  useEffect(() => {
+    if (initialStartTime) {
+      setStartTime(initialStartTime);
+    }
+  }, [initialStartTime]);
+  
+  useEffect(() => {
+    socket.on("sessionInfo", ({ startTime }) => {
+    const numericStart = Number(startTime);
+      console.log("Información de la sesión recibida:", startTime, new Date(numericStart).toLocaleTimeString());
+
+    if (!isNaN(numericStart)) {
+      setStartTime(numericStart);
+    } else {
+      console.warn("startTime inválido recibido:", startTime);
+    }
+  });
+
+  return () => socket.off("sessionInfo");
+}, []);
+
+
 
   //  Cuenta regresiva
-  useEffect(() => {
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          alert("La partida ha expirado. Regresando al inicio.");
-          socket.emit("closeRoom", { roomId: sessionId }); 
-          navigate("/");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(countdown);
-  }, [navigate]);
+useEffect(() => {
+  if (!startTime) return;
+
+  const interval = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
+    setTimer(remaining);
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+      alert("La partida ha expirado.");
+      navigate("/");
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [startTime]);
 
 
 
@@ -49,9 +74,8 @@ export default function GameLobby() {
 
   // Botón para cerrar manualmente
   const handleLeaveAsHost = () => {
-    socket.emit("closeRoom", { roomId: sessionId }); // 🔴 Notifica al backend
+    socket.emit("closeRoom", { roomId: sessionId });
   };
-
 
   //  Crear sesión y unirse a la sala socket
   useEffect(() => {
@@ -89,12 +113,13 @@ export default function GameLobby() {
         });
 
 
-        // 💬 Unirse a la sala WebSocket
         socket.emit("joinRoom", {
           roomId: data.sessionId,
-          nickname,
-          vehicle: "Rojo" // Si deseas incluirlo aquí
+          nickname: nickname,
+          vehicle: "Rojo"
         });
+
+        socket.emit("createRoom", { roomId: data.sessionId });
 
         setIsHost(true);
       } catch (error) {
@@ -180,6 +205,8 @@ export default function GameLobby() {
       <Button className="lobby-exit-btn" onClick={handleLeaveAsHost}>
         Cancelar Partida
       </Button>
+      <p>🕒 Tiempo UNIX: {startTime}</p>
+
 
       
 

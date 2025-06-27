@@ -15,11 +15,48 @@ export default function JoinGame() {
   const [seleccionada, setSeleccionada] = useState(null);
   const [tracksInfo, setTracksInfo] = useState({});
   const [hostPlayers, setHostPlayers] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [timer, setTimer] = useState(null);
+
+  useEffect(() => {
+    socket.on("sessionInfo", ({ startTime }) => {
+    const numericStart = Number(startTime);
+      console.log("Información de la sesión recibida:", startTime, new Date(numericStart).toLocaleTimeString());
+
+    if (!isNaN(numericStart)) {
+      setStartTime(numericStart);
+    } else {
+      console.warn("startTime inválido recibido:", startTime);
+    }
+  });
+
+  return () => socket.off("sessionInfo");
+}, []);
+
+
+  //  Cuenta regresiva
+useEffect(() => {
+  if (!startTime) return;
+
+  const interval = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
+    setTimer(remaining);
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+      alert("La partida ha expirado.");
+      navigate("/");
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [startTime]);
+
 
   useEffect(() => {
     async function fetchAvailableGames() {
       try {
-        const games =await  fetchGameSessions();
+        const games = await fetchGameSessions();
         setPartidas(games);
         const uniqueTrackIds = [...new Set(games.map(p => p.idTrack))];
         const trackEntries = await Promise.all(
@@ -141,34 +178,52 @@ export default function JoinGame() {
           className="join-btn"
           disabled={!seleccionada}
           onClick={() => {
-            const partida = partidas.find(p => p.id === seleccionada);
-            if (!partida) {
-              alert("La partida ya no está disponible.");
-              return;
-            }
-            let isHost = false;
-            const success = registerPlayer({idSession: partida.id, nickname:nickname, isHost:isHost});
-            if (!success) {
-              alert("Error al unirse a la partida. Inténtalo de nuevo.");
-              return;
-            }
+  const partida = partidas.find(p => p.id === seleccionada);
+  if (!partida) {
+    alert("La partida ya no está disponible.");
+    return;
+  }
 
+  const isHost = false;
+  registerPlayer({ idSession: partida.id, nickname, isHost })
+    .then(() => {
+      // 🔊 Emitimos joinRoom
+      socket.emit("joinRoom", {
+        roomId: partida.id,
+        nickname,
+        vehicle: vehiculo
+      });
 
-            socket.emit("joinRoom", {
-              roomId: partida.id,
-              nickname,
-              vehicle: vehiculo
-            });
+      //🕒 Esperamos a recibir el startTime antes de navegar
+      const handleSessionInfo = ({ startTime }) => {
+        const numericStart = Number(startTime);
+        if (isNaN(numericStart)) {
+          alert("Error: startTime inválido recibido");
+          return;
+        }
 
-            navigate("/game-lobby", {
-              state: {
-                nickname,
-                sessionId: partida.id,
-                vehicle: vehiculo,
-                isHost: false,
-              }
-            });
-          }}
+        // ✅ Navegar solo después de recibir el tiempo
+        navigate("/game-lobby", {
+          state: {
+            nickname,
+            sessionId: partida.id,
+            vehicle: vehiculo,
+            isHost: false,
+            startTime: numericStart
+          }
+        });
+
+        socket.off("sessionInfo", handleSessionInfo); // Limpiar listener
+      };
+
+      socket.on("sessionInfo", handleSessionInfo);
+    })
+    .catch((error) => {
+      console.error("Error al registrar jugador:", error);
+      alert("Error al unirse a la partida.");
+    });
+}}
+
         >
           Entrar a la partida 🚀
         </button>
