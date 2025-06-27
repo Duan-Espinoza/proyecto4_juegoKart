@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/JoinGame.css';
 import { fetchGameSessions } from '../services/gameService';
 import { getTrackById } from '../services/trackService';
+import { getHostPlayer } from '../services/playerService';
+import { registerPlayer } from '../services/playerService';
 import socket from '../services/socket';
 
 export default function JoinGame() {
@@ -12,43 +14,105 @@ export default function JoinGame() {
   const [vehiculo, setVehiculo] = useState('Rojo');
   const [seleccionada, setSeleccionada] = useState(null);
   const [tracksInfo, setTracksInfo] = useState({});
+  const [hostPlayers, setHostPlayers] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [timer, setTimer] = useState(null);
 
   useEffect(() => {
-    if (seleccionada && nickname && vehiculo) {
-      const partida = partidas.find(p => p.id === seleccionada);
-      if (partida) {
-        socket.emit('joinRoom', {
-          roomId: partida.id,
-          nickname,
-          vehicle: vehiculo
-        });
-      }
+    socket.on("sessionInfo", ({ startTime }) => {
+    const numericStart = Number(startTime);
+      console.log("Información de la sesión recibida:", startTime, new Date(numericStart).toLocaleTimeString());
+
+    if (!isNaN(numericStart)) {
+      setStartTime(numericStart);
+    } else {
+      console.warn("startTime inválido recibido:", startTime);
     }
-  }, [seleccionada, nickname, vehiculo, partidas]);
+  });
+
+  return () => socket.off("sessionInfo");
+}, []);
+
 
   useEffect(() => {
-    async function fetchAndSetPartidas() {
-      try {
-        const gameSessions = await fetchGameSessions();
-        setPartidas(gameSessions);
+    if (!startTime) return;
 
-        const uniqueTrackIds = [...new Set(gameSessions.map(p => p.idTrack))];
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
+      setTimer(remaining);
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        alert("La partida ha expirado.");
+        navigate("/");
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+
+  useEffect(() => {
+    async function fetchAvailableGames() {
+      try {
+        const games = await fetchGameSessions();
+        setPartidas(games);
+        const uniqueTrackIds = [...new Set(games.map(p => p.idTrack))];
         const trackEntries = await Promise.all(
           uniqueTrackIds.map(async (id) => {
             const track = await getTrackById(id);
             return [id, track];
           })
         );
+
         const tracksMap = Object.fromEntries(trackEntries);
         setTracksInfo(tracksMap);
+
+        const hostPromises = games.map(async (game) => {
+          const host = await getHostPlayer(game.id);
+          return { gameId: game.id, hostNickname: host.nickName };
+        });
+
+        const hostPlayersData = await Promise.all(hostPromises);
+        setHostPlayers(hostPlayersData);
+
       } catch (error) {
-        console.error('Error al obtener partidas y pists:', error);
+        console.error('Error fetching available games:', error);
+        alert('Error al cargar las partidas disponibles. Inténtalo de nuevo más tarde.');
       }
     }
-    fetchAndSetPartidas();
+    fetchAvailableGames();
+  }, []);
 
-    const interval = setInterval(fetchAndSetPartidas, 3000);
-    return () => clearInterval(interval);
+  useEffect(() => {
+
+    const handleAvailableGames = (games) => {
+      setPartidas(games);
+
+      const uniqueTrackIds = [...new Set(games.map(p => p.idTrack))];
+      Promise.all(
+        uniqueTrackIds.map(async (id) => {
+          const track = await getTrackById(id);
+          return [id, track];
+        })
+      ).then(trackEntries => {
+        const tracksMap = Object.fromEntries(trackEntries);
+        setTracksInfo(tracksMap);
+      });
+    }
+
+    socket.on('availableGames', handleAvailableGames);
+
+    socket.emit('requestAvailableGames');
+
+    const interval = setInterval(() => {
+      socket.emit('requestAvailableGames');
+    }, 3000); // Actualiza cada 3 segundos
+
+    return () => {
+      socket.off('availableGames', handleAvailableGames);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -74,10 +138,11 @@ export default function JoinGame() {
             <table className="partidas-table">
               <thead>
                 <tr>
+                  <th>Host</th>
                   <th>Modo</th>
                   <th>Pista</th>
                   <th>Jugadores</th>
-                  <th>Vueltas</th>
+                  <th>Vueltas</th>  
                 </tr>
               </thead>
               <tbody>
@@ -90,6 +155,9 @@ export default function JoinGame() {
                       className={isSelected ? 'selected-row' : ''}
                       onClick={() => setSeleccionada(partida.id)}
                     >
+                      <td>
+                        {hostPlayers.find(h => h.gameId === partida.id)?.hostNickname || 'Cargando...'}
+                      </td>
                       <td>{partida.gameMode}</td>
                       <td>{track ? track.nombre : 'Cargando...'}</td>
                       <td>{partida.players.length} / {track ? track.cantidadCarriles : '...'}</td>
@@ -105,6 +173,52 @@ export default function JoinGame() {
         <button
           className="join-btn"
           disabled={!seleccionada}
+          onClick={() => {
+  const partida = partidas.find(p => p.id === seleccionada);
+  if (!partida) {
+    alert("La partida ya no está disponible.");
+    return;
+  }
+
+  const isHost = false;
+  registerPlayer({ idSession: partida.id, nickname, isHost })
+    .then(() => {
+      // 🔊 Emitimos joinRoom
+      socket.emit("joinRoom", {
+        roomId: partida.id,
+        nickname,
+        vehicle: vehiculo
+      });
+
+      //🕒 Esperamos a recibir el startTime antes de navegar
+      const handleSessionInfo = ({ startTime }) => {
+        const numericStart = Number(startTime);
+        if (isNaN(numericStart)) {
+          alert("Error: startTime inválido recibido");
+          return;
+        }
+
+        // ✅ Navegar solo después de recibir el tiempo
+        navigate("/game-lobby", {
+          state: {
+            nickname,
+            sessionId: partida.id,
+            vehicle: vehiculo,
+            isHost: false,
+            startTime: numericStart
+          }
+        });
+
+        socket.off("sessionInfo", handleSessionInfo); // Limpiar listener
+      };
+
+      socket.on("sessionInfo", handleSessionInfo);
+    })
+    .catch((error) => {
+      console.error("Error al registrar jugador:", error);
+      alert("Error al unirse a la partida.");
+    });
+}}
         >
           Entrar a la partida 🚀
         </button>

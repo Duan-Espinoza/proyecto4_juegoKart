@@ -59,7 +59,24 @@ const joinGame = async (req, res) => {
     res.status(500).json({ error: 'Error al unirse a la partida' });
   }
 };
+
+const getHostPlayer = async (req, res) => {
+    const rawId = req.params.sessionId;
+    const sessionId = Number(rawId);
+
+    console.log('Fetching host player for session ID (backend/controllers):', sessionId);
+    try {
+        const hostPlayer = await playerService.getHostPlayer(sessionId);
+        console.log('Host player fetched successfully (backend/controllers):', hostPlayer);
+        res.status(200).json(hostPlayer);
+    } catch (error) {
+        console.error('Error fetching host player (backend/controllers):', error);
+        res.status(500).json({ error: 'Failed to fetch host player (backend/controllers)' });
+    }
+};
+
 module.exports = {
     registerGamePlayer,
-    joinGame
+    joinGame,
+    getHostPlayer
 };

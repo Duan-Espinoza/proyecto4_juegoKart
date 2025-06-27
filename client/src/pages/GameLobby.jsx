@@ -1,40 +1,78 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import "../styles/GameLobby.css";
 import { createGameSession } from "../services/gameService";
 import { registerPlayer } from "../services/playerService";
 import { getIDTrackByName } from "../services/trackService";
-import socket from "../services/socket"; // 👈 importar socket
-
-const GAME_TIMEOUT_SECONDS = 180;
+import socket from "../services/socket";
 
 export default function GameLobby() {
   const navigate = useNavigate();
-  const { nickname, gameType, track, laps, numPlayers } = useLocation().state || {};
+  const { nickname, gameType, track, laps, numPlayers, startTime: initialStartTime } = useLocation().state || {};
   const [players, setPlayers] = useState([nickname]);
   const [isHost, setIsHost] = useState(true);
   const [gameReady, setGameReady] = useState(false);
-  const [timer, setTimer] = useState(GAME_TIMEOUT_SECONDS);
-  const [gameCode] = useState(() => generateGameCode());
   const [idTrack, setIdTrack] = useState(null);
   const [sessionId, setSessionId] = useState(null); // para unirse a la sala
+  const [startTime, setStartTime] = useState(null);
+  const [timer, setTimer] = useState(0);
+  
+  useEffect(() => {
+    if (initialStartTime) {
+      setStartTime(initialStartTime);
+    }
+  }, [initialStartTime]);
+
+  useEffect(() => {
+    socket.on("sessionInfo", ({ startTime }) => {
+    const numericStart = Number(startTime);
+      console.log("Información de la sesión recibida:", startTime, new Date(numericStart).toLocaleTimeString());
+
+    if (!isNaN(numericStart)) {
+      setStartTime(numericStart);
+    } else {
+      console.warn("startTime inválido recibido:", startTime);
+    }
+  });
+
+  return () => socket.off("sessionInfo");
+}, []);
+
+
 
   //  Cuenta regresiva
+useEffect(() => {
+  if (!startTime) return;
+
+  const interval = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((startTime - Date.now()) / 1000));
+    setTimer(remaining);
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+      alert("La partida ha expirado.");
+      navigate("/");
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [startTime]);
+
+
+
   useEffect(() => {
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          alert("La partida ha expirado. Regresando al inicio.");
-          navigate("/");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(countdown);
+  socket.on("sessionClosed", ({ roomId }) => {
+    alert("La partida ha sido cerrada.");
+    navigate("/");
+  });
+    return () => socket.off("sessionClosed");
   }, [navigate]);
+
+  // Botón para cerrar manualmente
+  const handleLeaveAsHost = () => {
+    socket.emit("closeRoom", { roomId: sessionId });
+  };
 
   //  Crear sesión y unirse a la sala socket
   useEffect(() => {
@@ -42,7 +80,17 @@ export default function GameLobby() {
       try {
         const idTrack = await getIDTrackByName(track.nombre);
         setIdTrack(idTrack);
+      
 
+        console.log("Creando sesión de juego con los siguientes datos:", {
+          players: [nickname],
+          gameType,
+          idTrack,
+          track,
+          laps,
+          numPlayers
+        });
+        
         const data = await createGameSession({
           players: [nickname],
           gameType,
@@ -51,21 +99,24 @@ export default function GameLobby() {
           laps,
           numPlayers
         });
+        console.log("Sesión creada:", data);
 
         setSessionId(data.sessionId);
 
         await registerPlayer({
           idSession: data.sessionId,
-          nickname,
+          nickname: nickname,
           isHost: true
         });
 
-        // 💬 Unirse a la sala WebSocket
+
         socket.emit("joinRoom", {
           roomId: data.sessionId,
-          nickname,
-          vehicle: "Rojo" // Si deseas incluirlo aquí
+          nickname: nickname,
+          vehicle: "Rojo"
         });
+
+        socket.emit("createRoom", { roomId: data.sessionId });
 
         setIsHost(true);
       } catch (error) {
@@ -94,7 +145,6 @@ export default function GameLobby() {
     };
   }, []);
 
-  // ✔️ Habilitar "Iniciar" cuando estén listos todos
   useEffect(() => {
     if (players.length === numPlayers) {
       setGameReady(true);
@@ -119,6 +169,8 @@ export default function GameLobby() {
     };
   }, [navigate, players, sessionId, nickname]);
 
+  
+
   const formatTime = (seconds) => {
     const min = String(Math.floor(seconds / 60)).padStart(2, "0");
     const sec = String(seconds % 60).padStart(2, "0");
@@ -128,7 +180,6 @@ export default function GameLobby() {
   return (
     <div className="lobby-container">
       <h1 className="lobby-title">Lobby de Partida</h1>
-      <p className="lobby-subtitle">Código de partida: <strong>{gameCode}</strong></p>
       <p className="lobby-timer">Tiempo restante: {formatTime(timer)}</p>
 
       <ul className="lobby-player-list">
@@ -147,14 +198,13 @@ export default function GameLobby() {
         </Button>
       )}
 
-      <Button className="lobby-exit-btn" onClick={() => navigate("/")}>
-        Salir del Lobby
+      <Button className="lobby-exit-btn" onClick={handleLeaveAsHost}>
+        Cancelar Partida
       </Button>
+      
+
     </div>
   );
 }
 
-function generateGameCode() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
+

@@ -29,8 +29,8 @@ async function registerPlayer(idSession, nickname, isHost = false) {
 
         // Insertar el jugador en la base de datos
         const [result] = await pool.execute(
-            'INSERT INTO Player (nickname, idGame) VALUES (?, ?)',
-            [player.nickName, player.idSession]
+            'INSERT INTO Player (nickname, idGame, isHost) VALUES (?, ?, ?)',
+            [player.nickName, player.idSession, player.isHost ]
         );
         if (result.affectedRows === 0) {
             throw new Error("Error al registrar el jugador en la base de datos.");
@@ -49,6 +49,55 @@ async function registerPlayer(idSession, nickname, isHost = false) {
     }
 }
 
+async function getHostPlayer(sessionId) {
+    try {
+        console.log("Obteniendo jugador host para la sesión ID:", sessionId, "(backend/services)");
+        // Verificar si el sessionId es válido
+        if (!sessionId || typeof sessionId !== 'number') { 
+            throw new Error("El ID de la sesión es obligatorio y debe ser un número");
+        }
+        // Consultar el jugador host de la base de datos
+        const [rows] = await pool.execute(
+            'SELECT * FROM Player WHERE idGame = ? AND isHost = 1',
+            [sessionId]
+        );
+        if (rows.length === 0) {
+            throw new Error("No se encontró un jugador host para la sesión especificada.");
+        }
+        console.log("Jugador host encontrado(backend/services):", rows[0].nickname, "ID:", rows[0].id);
+        return rows[0]; // Retornar el jugador host encontrado
+    } catch (error) {
+        console.error("Error al obtener el jugador host (backend/services):", error.message);
+        throw new Error("Error al obtener el jugador host (backend/services).");
+    }
+}
+
+//Funcion que retorna los jugadores de una partida
+async function getPlayersBySessionId(sessionId) {
+    try {
+        console.log("Obteniendo jugadores para la sesión ID:", sessionId, "(backend/services)");
+        // Verificar si el sessionId es válido
+        if (!sessionId || typeof sessionId !== 'number') {
+            throw new Error("El ID de la sesión es obligatorio y debe ser un número");
+        }
+        // Consultar los jugadores de la base de datos
+        const [rows] = await pool.execute(
+            'SELECT * FROM Player WHERE idGame = ?',
+            [sessionId]
+        );
+        if (rows.length === 0) {
+            throw new Error("No se encontraron jugadores para la sesión especificada.");
+        }
+        console.log("Jugadores encontrados (backend/services):", rows);
+        return rows; // Retornar los jugadores encontrados
+    } catch (error) {
+        console.error("Error al obtener jugadores (backend/services):", error.message);
+        throw new Error("Error al obtener jugadores (backend/services).");
+    }
+}
+
 module.exports = {
-    registerPlayer
+    registerPlayer,
+    getHostPlayer,
+    getPlayersBySessionId
 };

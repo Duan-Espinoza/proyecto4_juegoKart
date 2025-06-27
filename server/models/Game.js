@@ -6,7 +6,7 @@ class Game {
         this.gameMode = gameMode; // 'VS' or 'TIEMPO'
         this.totalLaps = totalLaps;
         this.hostPlayerId = hostPlayerId;
-        this.gameState = gameState; // 'WAITING', 'ACTIVE', 'FINISHED'
+        this.gameState = gameState; // 'WAITING', 'ACTIVE', 'FINISHED' , 'CANCELED'
         this.gameTime = gameTime;
         this.startDate = startDate;
         this.finishDate = finishDate;
